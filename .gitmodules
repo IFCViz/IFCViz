@@ -1,0 +1,3 @@
+[submodule "docs/IFC.js"]
+	path = docs/IFC.js
+	url = git@github.com:IFCjs/docs.git
