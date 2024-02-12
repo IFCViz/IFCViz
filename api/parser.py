@@ -1,21 +1,16 @@
 import ifcopenshell
 import ifcopenshell.util.element
+import json
 
 def parse(file_name):
     model = ifcopenshell.open(file_name)
 
-    # Gets the units used in the model
-
-    # global_unit_assignments = model.by_type("IfcUnitAssignment")
-    # print(global_unit_assignments)
-    # # The global context defines 0 or more unit sets, each containing IFC unit definitions (using list comprehension):
-    # global_length_unit_definition = [u for ua in global_unit_assignments for u in ua.Units if u.is_a() in ('IfcSIUnit', 'IfcConversionBasedUnit') and u.UnitType=='LENGTHUNIT'][-1]
-    # print(global_length_unit_definition)
-
-    # print(model.schema) # May return IFC2X3, IFC4, or IFC4X3.
-    # print(model.by_id(1))
-
-    # print(model.by_guid('0EI0MSHbX9gg8Fxwar7lL8'))
+    # Get model name
+    model_name = file_name.split("/")[-1]
+    # Make the name cleaner
+    # model_name = model_name.split(".")[0].replace("_", " ").replace("-", " ").title()
+    print(model_name)
+    json_dict = {model_name: {"floors": []}}
 
     floors = [floor for floor in model.by_type('IfcSlab') if ifcopenshell.util.element.get_predefined_type(floor) == "FLOOR"]
     if len(floors) == 0:
@@ -28,7 +23,12 @@ def parse(file_name):
         properties = ifcopenshell.util.element.get_psets(floor)
         base_properties = properties["BaseQuantities"]
 
-        result += f"Object name: {floor.Name}<br>"
-        result += f"&emsp;&emsp;Area: {base_properties['GrossArea']} m^2<br>"
-
+        json_dict[model_name]["floors"].append({floor.Name: base_properties['GrossArea']})
+#         result += f"Object name: {floor.Name}<br>"
+#         result += f"&emsp;&emsp;Area: {base_properties['GrossArea']} m^2<br>"
+    final_json = json.dumps(json_dict)
+    print(final_json)
     return result
+
+if __name__ == "__main__":
+    parse('../test_files/simple_house.ifc')
