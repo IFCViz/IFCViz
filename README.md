@@ -16,12 +16,5 @@ Start the Flask backend server:
 cd api/ && flask run
 ```
 
-## How to read the docs?
-### IFC.js docs
-`cd docs/IFC.js && npm run serve`
-
-Start the VueJs frontend development server:
-```bash
-cd webapp/ && npm install && npm run dev
-```
-
+## Docs
+[IFC.js](https://docs.thatopen.com/Tutorials/FragmentIfcLoader)
