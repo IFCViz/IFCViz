@@ -2,6 +2,7 @@ import ifcopenshell
 import ifcopenshell.util.element
 import json
 
+
 def parse(file_name):
     model = ifcopenshell.open(file_name)
 
@@ -16,7 +17,7 @@ def parse(file_name):
     if len(floors) == 0:
         return "No floors found!<br>"
 
-    result = f"Amount of floor type objects: {len(floors)}<br><br>"
+    # result = f"Amount of floor type objects: {len(floors)}<br><br>"
 
     for floor in floors:
         # Get the right properties
@@ -24,11 +25,10 @@ def parse(file_name):
         base_properties = properties["BaseQuantities"]
 
         json_dict[model_name]["floors"].append({floor.Name: base_properties['GrossArea']})
-#         result += f"Object name: {floor.Name}<br>"
-#         result += f"&emsp;&emsp;Area: {base_properties['GrossArea']} m^2<br>"
+        # result += f"Object name: {floor.Name}<br>"
+        # result += f"&emsp;&emsp;Area: {base_properties['GrossArea']} m^2<br>"
     final_json = json.dumps(json_dict)
-    print(final_json)
-    return result
+    return final_json
 
 if __name__ == "__main__":
     parse('../test_files/simple_house.ifc')
