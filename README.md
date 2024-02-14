@@ -6,6 +6,12 @@ A tool to visualize IFC files in a browser
 - Node.js (>=18.0.0)
 - NPM
 
+## Submodules
+Fetch them using:
+```bash
+git submodule update --init
+```
+
 ## How to run the server?
 Start the Flask backend server:
 ```bash
