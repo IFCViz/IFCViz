@@ -28,7 +28,7 @@ def try_or_default(default):
 
 
 # Helper to prevent try/catch inside Flask app
-def dump_gzip(contents: bytes, filename: str) -> bool:
+def dump_contents(contents: bytes, filename: str) -> bool:
     with open(app.config['UPLOAD_FOLDER']+filename, 'wb') as f:
         f.write(contents)
 
@@ -38,7 +38,6 @@ def dump_gzip(contents: bytes, filename: str) -> bool:
 
 @app.route("/upload/", methods=['POST'])
 def upload():
-    ERROR_NO_FILE = make_response(json.dumps({'error': 'no uploaded file'}),        400)
     ERROR_NO_GZIP = make_response(json.dumps({'error': 'file not gzipped'}),        400)
     ERROR_NO_SAVE = make_response(json.dumps({'error': 'file cannot be saved'}),    500)
     ERROR_F_EXIST = make_response(json.dumps({'error': 'file already exists'}),     500)
@@ -53,26 +52,21 @@ def upload():
     # file = request.files['file']
     # ================================================================
 
-    GzipFileSafe = try_or_default(None)(gzip.GzipFile)
-    gzip_file = GzipFileSafe(fileobj=io.BytesIO(request.data), mode='rb')
-    
-    if not gzip_file:
-        return ERROR_NO_GZIP
+    contents = request.data
 
-    # Flushes the read buffer automatically that's why we save the contents
-    contents = gzip_file.read()
-    if not contents:
-        gzip_file.close()
-        return ERROR_NO_FILE
-    
+    gzip_file = gzip.GzipFile(fileobj=io.BytesIO(request.data), mode='rb')
+    gzip_contents = try_or_default(None)(gzip_file.read)()
     gzip_file.close()
 
+    if not gzip_contents:
+        return ERROR_NO_GZIP
+    
     filename = sha256(contents).hexdigest()
     # If implementing hash storage in DB use query instead of `os.path.isfile``
     if os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
         return ERROR_F_EXIST
 
-    if not try_or_default(False)(dump_gzip)(contents, filename):
+    if not try_or_default(False)(dump_contents)(contents, filename):
         return ERROR_NO_SAVE
     
     return make_response(json.dumps({'fileid': filename}), 200)
