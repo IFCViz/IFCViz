@@ -3,7 +3,9 @@ import io
 import json
 import gzip
 from hashlib import sha256
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, send_file
+
+from typing import Optional
 
 
 app = Flask(__name__)
@@ -12,7 +14,7 @@ app.config['UPLOAD_FOLDER'] = 'uploads/'
 
 
 def secure_filename(filename: str) -> str:
-    return "".join(x for x in filename if x.isalpha())
+    return "".join(x for x in filename if x.isalnum())
 
 # Function wrapper, returns `default` if exception rises in `f`. Must have
 # ..since Flask ignores try/except and raises the catched error
@@ -35,8 +37,24 @@ def dump_contents(contents: bytes, filename: str) -> bool:
     return True
 
 
+@app.route("/receive/<string:filehash>")
+def send(filehash: str):
+    ERROR_NO_FILE = make_response(json.dumps({'error': 'file does not exist'}),     400)
 
-@app.route("/upload/", methods=['POST'])
+
+    filename: str = secure_filename(filehash)
+    # If implementing hash storage in DB use query instead of `os.path.isfile``
+    if not os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
+        return ERROR_NO_FILE
+    
+    f = open(app.config['UPLOAD_FOLDER']+filename, 'rb')
+    contents: io.BytesIO = io.BytesIO(f.read())
+    f.close()
+
+    return send_file(contents, mimetype='application/gzip', as_attachment=False)
+
+
+@app.route("/upload", methods=['POST'])
 def upload():
     ERROR_NO_GZIP = make_response(json.dumps({'error': 'file not gzipped'}),        400)
     ERROR_NO_SAVE = make_response(json.dumps({'error': 'file cannot be saved'}),    500)
@@ -52,16 +70,16 @@ def upload():
     # file = request.files['file']
     # ================================================================
 
-    contents = request.data
+    contents: bytes = request.data
 
-    gzip_file = gzip.GzipFile(fileobj=io.BytesIO(request.data), mode='rb')
-    gzip_contents = try_or_default(None)(gzip_file.read)()
+    gzip_file: gzip.GzipFile = gzip.GzipFile(fileobj=io.BytesIO(request.data), mode='rb')
+    gzip_contents: Optional[bytes] = try_or_default(None)(gzip_file.read)()
     gzip_file.close()
 
     if not gzip_contents:
         return ERROR_NO_GZIP
     
-    filename = sha256(contents).hexdigest()
+    filename: str = sha256(contents).hexdigest()
     # If implementing hash storage in DB use query instead of `os.path.isfile``
     if os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
         return ERROR_F_EXIST
