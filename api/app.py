@@ -89,5 +89,10 @@ def upload():
     
     return make_response(json.dumps({'fileid': filename}), 200)
 
+@app.route("/", methods=["GET"])
+def welcome():
+    return "Hello World!"
+
+
 if __name__ == '__main__':
     app.run(use_reloader = False)
