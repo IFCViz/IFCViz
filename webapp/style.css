@@ -1,0 +1,37 @@
+
+
+#app {
+    text-align: center;
+    margin-top: 50px;
+}
+
+button {
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+#file-drop-area {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+pre {
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 4px;
+    overflow: auto;
+    max-width: 600px;
+    margin: 20px auto;
+}
