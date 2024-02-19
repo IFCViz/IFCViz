@@ -16,6 +16,7 @@ app.config['UPLOAD_FOLDER'] = 'uploads/'
 def secure_filename(filename: str) -> str:
     return "".join(x for x in filename if x.isalnum())
 
+
 # Function wrapper, returns `default` if exception rises in `f`. Must have
 # ..since Flask ignores try/except and raises the catched error
 def try_or_default(default):
@@ -40,7 +41,6 @@ def dump_contents(contents: bytes, filename: str) -> bool:
 @app.route("/receive/<string:filehash>")
 def send(filehash: str):
     ERROR_NO_FILE = make_response(json.dumps({'error': 'file does not exist'}),     400)
-
 
     filename: str = secure_filename(filehash)
     # If implementing hash storage in DB use query instead of `os.path.isfile``
@@ -89,10 +89,11 @@ def upload():
     
     return make_response(json.dumps({'fileid': filename}), 200)
 
+
 @app.route("/", methods=["GET"])
 def welcome():
     return "Hello World!"
 
 
 if __name__ == '__main__':
-    app.run(use_reloader = False)
+    app.run(use_reloader=False)
