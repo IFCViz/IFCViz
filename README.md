@@ -2,9 +2,18 @@
 A tool to visualize IFC files in a browser
 
 ## Dependencies
-- Flask: `python -m pip install flask`
+- Flask:
+```bash
+pip3 install flask
+pip3 install ifcopenshell
+pip3 install lark
+```
 - Node.js (>=18.0.0)
 - NPM
+- yarn:
+```bash
+sudo npm install --global yarn
+```
 
 ## Submodules
 Fetch them using:
@@ -18,8 +27,5 @@ Start the Flask backend server:
 cd api/ && flask run
 ```
 
-Start the VueJs frontend development server:
-```bash
-cd webapp/ && npm install && npm run dev
-```
-
+## Docs
+[IFC.js](https://docs.thatopen.com/Tutorials/FragmentIfcLoader)

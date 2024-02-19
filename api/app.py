@@ -4,9 +4,10 @@ import json
 import gzip
 from hashlib import sha256
 from flask import Flask, request, make_response, send_file
-
 from typing import Optional
 
+from flask import Flask
+from parser import parse
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
@@ -46,7 +47,7 @@ def send(filehash: str):
     # If implementing hash storage in DB use query instead of `os.path.isfile``
     if not os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
         return ERROR_NO_FILE
-    
+
     f = open(app.config['UPLOAD_FOLDER']+filename, 'rb')
     contents: io.BytesIO = io.BytesIO(f.read())
     f.close()
@@ -78,7 +79,7 @@ def upload():
 
     if not gzip_contents:
         return ERROR_NO_GZIP
-    
+
     filename: str = sha256(contents).hexdigest()
     # If implementing hash storage in DB use query instead of `os.path.isfile``
     if os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
@@ -86,13 +87,19 @@ def upload():
 
     if not try_or_default(False)(dump_contents)(contents, filename):
         return ERROR_NO_SAVE
-    
+
     return make_response(json.dumps({'fileid': filename}), 200)
 
 
 @app.route("/", methods=["GET"])
 def welcome():
     return "Hello World!"
+
+
+@app.route("/")
+def hello_world():
+    jsn = parse('../test_files/simple_house.ifc')
+    return f"<p>{jsn}</p>"
 
 
 if __name__ == '__main__':
