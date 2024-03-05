@@ -93,8 +93,7 @@ def upload():
 
 @app.route("/", methods=["GET"])
 def parsing_result():
-    jsn = parse(app.config['UPLOAD_FOLDER'] + 'simple_house.ifc')
-    return jsn
+    return parse(app.config['UPLOAD_FOLDER'] + 'simple_house.ifc')
 
 
 if __name__ == '__main__':
