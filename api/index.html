@@ -1,67 +1,63 @@
 <html>
 <head>
     <script>
-
-    
 		function allowDrop(ev) {
-  ev.preventDefault();
-}
+            ev.preventDefault();
+        }
 
-            function handleDrop(event) {
-                event.preventDefault();
+        function handleDrop(event) {
+            event.preventDefault();
 
-                const file = event.dataTransfer.files[0];
+            const file = event.dataTransfer.files[0];
 
-                if (file) {
-                    uploadFile(file);
-                }
+            if (file) {
+                uploadFile(file);
             }
+        }
 
-            async function uploadFile(file) {
-                const formData = new FormData();
-                formData.append('file', file);
+        async function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch('http://46.101.114.188:8080',{
+                    method: 'POST',
+                    body: formData,
+                });
                 
-                try {
-                    const response = await fetch('http://46.101.114.188:8080',{
-                        method: 'POST',
-                        body: formData,
+                const data = await response.json();
+                // Update the response variable to show it in the pre tag
+                response.value = JSON.stringify(data, null, 2);
+                console.log("value: " + response.value);
+                ifc_info = JSON.parse(response.value)["my_list"];
+                let containerDiv = document.createElement('div');
+                containerDiv.classList.add('info-container');
+
+                for (let i = 0; i < ifc_info.length; i++) {
+                    Object.keys(ifc_info[i]).forEach(function(k) {
+                        let infoDiv = document.createElement('div');
+                        infoDiv.classList.add('info-div');
+
+                        let keySpan = document.createElement('span');
+                        keySpan.classList.add('info-key');
+                        keySpan.innerText = k + ': ';
+
+                        let valueSpan = document.createElement('span');
+                        valueSpan.classList.add('info-value');
+                        valueSpan.innerText = ifc_info[i][k] + " kvm";
+
+                        infoDiv.appendChild(keySpan);
+                        infoDiv.appendChild(valueSpan);
+                        containerDiv.appendChild(infoDiv);
                     });
-                    
-                    const data = await response.json();
-                    // Update the response variable to show it in the pre tag
-                    response.value = JSON.stringify(data, null, 2);
-                    console.log("value: " + response.value);
-                    ifc_info = JSON.parse(response.value)["my_list"];
-                    let containerDiv = document.createElement('div');
-                    containerDiv.classList.add('info-container');
-
-                    for (let i = 0; i < ifc_info.length; i++) {
-                        Object.keys(ifc_info[i]).forEach(function(k) {
-                            let infoDiv = document.createElement('div');
-                            infoDiv.classList.add('info-div');
-
-                            let keySpan = document.createElement('span');
-                            keySpan.classList.add('info-key');
-                            keySpan.innerText = k + ': ';
-
-                            let valueSpan = document.createElement('span');
-                            valueSpan.classList.add('info-value');
-                            valueSpan.innerText = ifc_info[i][k] + " kvm";
-
-                            infoDiv.appendChild(keySpan);
-                            infoDiv.appendChild(valueSpan);
-                            containerDiv.appendChild(infoDiv);
-                        });
-                    }
-
-document.getElementById('container').appendChild(containerDiv)
-                    
-                    
-                    
-                } catch (error) {
-                    console.error('Error uploading file:', error);
                 }
+
+                document.getElementById('container').appendChild(containerDiv)  
+                    
+            } catch (error) {
+                console.error('Error uploading file:', error);
             }
+        }
 
         
         
