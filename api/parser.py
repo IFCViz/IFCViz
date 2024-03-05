@@ -10,7 +10,7 @@ def parse(file_name):
     model_name = file_name.split("/")[-1]
     # Make the name cleaner
     # model_name = model_name.split(".")[0].replace("_", " ").replace("-", " ").title()
-    print(model_name)
+    # print(model_name)
     json_dict = {model_name: {"floors": []}}
 
     floors = [floor for floor in model.by_type('IfcSlab') if ifcopenshell.util.element.get_predefined_type(floor) == "FLOOR"]
@@ -30,5 +30,6 @@ def parse(file_name):
     final_json = json.dumps(json_dict)
     return final_json
 
+
 if __name__ == "__main__":
-    parse('../test_files/simple_house.ifc')
+    parse('uploads/simple_house.ifc')
