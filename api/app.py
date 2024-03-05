@@ -73,12 +73,12 @@ def upload():
 
     contents: bytes = request.data
 
-    gzip_file: gzip.GzipFile = gzip.GzipFile(fileobj=io.BytesIO(request.data), mode='rb')
-    gzip_contents: Optional[bytes] = try_or_default(None)(gzip_file.read)()
-    gzip_file.close()
+    # gzip_file: gzip.GzipFile = gzip.GzipFile(fileobj=io.BytesIO(request.data), mode='rb')
+    # gzip_contents: Optional[bytes] = try_or_default(None)(gzip_file.read)()
+    # gzip_file.close()
 
-    if not gzip_contents:
-        return ERROR_NO_GZIP
+    # if not gzip_contents:
+    #     return ERROR_NO_GZIP
 
     filename: str = sha256(contents).hexdigest()
     # If implementing hash storage in DB use query instead of `os.path.isfile``
@@ -93,6 +93,7 @@ def upload():
 
 @app.route("/", methods=["GET"])
 def parsing_result():
+    # Returns a json
     return parse(app.config['UPLOAD_FOLDER'] + 'simple_house.ifc')
 
 

@@ -20,7 +20,7 @@
             formData.append('file', file);
             
             try {
-                const response = await fetch('http://46.101.114.188:8080',{
+                const response = await fetch('http://' + location.hostname + ':5000' + '/upload',{
                     method: 'POST',
                     body: formData,
                 });
