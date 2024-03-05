@@ -1,2 +1,2 @@
 Flask==2.2.2
-ifcopenshell==0.7.0.f0e0
+ifcopenshell>=0.7
