@@ -3,7 +3,7 @@ import io
 import json
 import gzip
 from hashlib import sha256
-from flask import Flask, request, make_response, send_file
+from flask import Flask, request, make_response, send_file, render_template
 from typing import Optional
 
 from flask import Flask
@@ -57,7 +57,7 @@ def send(filehash: str):
 
 @app.route("/upload", methods=['POST'])
 def upload():
-    ERROR_NO_GZIP = make_response(json.dumps({'error': 'file not gzipped'}),        400)
+    # ERROR_NO_GZIP = make_response(json.dumps({'error': 'file not gzipped'}),        400)
     ERROR_NO_SAVE = make_response(json.dumps({'error': 'file cannot be saved'}),    500)
     ERROR_F_EXIST = make_response(json.dumps({'error': 'file already exists'}),     500)
 
@@ -76,7 +76,7 @@ def upload():
     # gzip_file: gzip.GzipFile = gzip.GzipFile(fileobj=io.BytesIO(request.data), mode='rb')
     # gzip_contents: Optional[bytes] = try_or_default(None)(gzip_file.read)()
     # gzip_file.close()
-
+    #
     # if not gzip_contents:
     #     return ERROR_NO_GZIP
 
@@ -95,7 +95,8 @@ def upload():
 def parsing_result():
     # Returns a json
     return parse(app.config['UPLOAD_FOLDER'] + 'simple_house.ifc')
+    # return render_template("../webapp/template/index.html")
 
 
 if __name__ == '__main__':
-    app.run(use_reloader=False)
+    app.run()
