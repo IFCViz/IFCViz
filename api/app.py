@@ -8,6 +8,7 @@ from typing import Optional
 
 from flask import Flask
 from parser import parse
+import db
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
