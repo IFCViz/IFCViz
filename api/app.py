@@ -4,12 +4,14 @@ import json
 import gzip
 from hashlib import sha256
 from flask import Flask, request, make_response, send_file
+from flask_cors import CORS
 from typing import Optional
 
 from flask import Flask
 from parser import parse
 
 app = Flask(__name__)
+CORS(app)
 app.secret_key = "super secret key"
 app.config['UPLOAD_FOLDER'] = 'uploads/'
 
@@ -57,10 +59,11 @@ def send(filehash: str):
 
 @app.route("/upload", methods=['POST'])
 def upload():
+    print("Server got an upload request!");
     ERROR_NO_GZIP = make_response(json.dumps({'error': 'file not gzipped'}),        400)
     ERROR_NO_SAVE = make_response(json.dumps({'error': 'file cannot be saved'}),    500)
     ERROR_F_EXIST = make_response(json.dumps({'error': 'file already exists'}),     500)
-
+    
     # KEEP THE CODE BELLOW IF SWITCHING TO FORM FILE UPLOAD STYLE!!!!!
     # ================================================================
     # if 'file' not in request.files or request.files[0].filename == '':
@@ -89,7 +92,6 @@ def upload():
         return ERROR_NO_SAVE
 
     return make_response(json.dumps({'fileid': filename}), 200)
-
 
 @app.route("/", methods=["GET"])
 def parsing_result():
