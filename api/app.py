@@ -82,7 +82,7 @@ def upload():
     # ================================================================
 
     contents: bytes = request.data
-
+    
     gzip_file: gzip.GzipFile = gzip.GzipFile(fileobj=io.BytesIO(request.data), mode='rb')
     gzip_contents: Optional[bytes] = try_or_default(None)(gzip_file.read)()
     gzip_file.close()
@@ -102,7 +102,7 @@ def upload():
     filename: str = sha256(contents).hexdigest()
     # If implementing hash storage in DB use query instead of `os.path.isfile``
     if os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
-        return ERROR_F_EXIST
+        return make_response(json.dumps({'fileid': filename}), 200)
 
     if not try_or_default(False)(dump_contents)(contents, filename):
         return ERROR_NO_SAVE

@@ -1,8 +1,6 @@
 <html>
 <head>
     <script>
-        
-
 		function allowDrop(ev) {
             ev.preventDefault();
         }
@@ -50,17 +48,16 @@
         async function uploadFile(file) {
             const blob = await gzip_file(file);
             let response;
-            try {
-                response = await fetch('http://localhost:5000/upload',{
-                    method: 'POST',
-                    body: blob
-                });
-                
-                return await response.json();
-            } catch(error) {
-                console.error('Error uploading file:', error);
+            response = await fetch('http://localhost:5000/upload',{
+                method: 'POST',
+                body: blob
+            });
+            if(response.ok == false){
+                console.log("Error uploading file!!");
+                console.log(response_text.error);
                 return null;
             }
+            return (await response.json()).fileid;
         }
         
         async function request_and_present(file_hash){
@@ -70,13 +67,15 @@
         
         //A function that will upload a file, get the response, and present it in the client's browser
         async function upload_and_present(file){
-            const response = await uploadFile(file);
-            console.log("value: " + JSON.stringify(response, null, 2));
+            const file_hash = await uploadFile(file);
+            console.log("value: " + JSON.stringify(file_hash, null, 2));
             
             //response.fileid is the hash
-            await request_and_present(response.fileid);
-        
+            await request_and_present(file_hash);
 
+
+            
+            /*
             ifc_info = JSON.parse(response.value)["my_list"];
             let containerDiv = document.createElement('div');
             containerDiv.classList.add('info-container');
@@ -99,19 +98,21 @@
                     containerDiv.appendChild(infoDiv);
                 });
             }
-            document.getElementById('container').appendChild(containerDiv)  
+            document.getElementById('container').appendChild(containerDiv) 
+            */ 
         }
 
         async function request_file(file_hash){
             let response;
-            try {
-                response = await fetch("http://localhost:5000/receive/" + file_hash, {
-                    method: "GET"
-                })
-                response = await response.blob();
-            } catch (error) {
-                console.error('Error receiving file:', error);
+            response = await fetch("http://localhost:5000/receive/" + file_hash, {
+                method: "GET"
+            })
+            if(response.ok == false){
+                console.error("Failed to get file");
+                return null;
             }
+            response = await response.blob();
+
             console.log(response);
             const parsed_blob = await ungzip_blob(response);
             const new_file = new File([parsed_blob], "../requested_files/"+file_hash+".txt", {type:"text/plain"});
