@@ -16,7 +16,7 @@ import ifcopenshell.file
 import ifcopenshell.validate
 
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='../webapp')
 CORS(app)
 app.secret_key = "super secret key"
 app.config['UPLOAD_FOLDER'] = 'uploads/'
@@ -46,6 +46,9 @@ def dump_contents(contents: bytes, filename: str) -> bool:
 
     return True
 
+@app.route("/testdb")
+def testdb():
+    return str(db.get_conn())
 
 @app.route("/receive/<string:filehash>")
 def send(filehash: str):
@@ -101,6 +104,7 @@ def upload():
 
     filename: str = sha256(contents).hexdigest()
     # If implementing hash storage in DB use query instead of `os.path.isfile``
+    db.new_analysis(filename, contents, parse(app.config['UPLOAD_FOLDER'] + filename))
     if os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
         return ERROR_F_EXIST
 
@@ -121,12 +125,9 @@ def metadata(filehash: str):
     
     return parse(app.config['UPLOAD_FOLDER'] + filename)
 
-
-# @app.route("/", methods=["GET"])
-# def parsing_result():
-#     # Returns a json
-#     return parse(app.config['UPLOAD_FOLDER'] + 'simple_house.ifc')
-#     # return render_template("../webapp/template/index.html")
+@app.route("/", methods=["GET"])
+def parsing_result():
+    return render_template("index.html")
 
 
 if __name__ == '__main__':
