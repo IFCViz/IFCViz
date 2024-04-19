@@ -8,8 +8,8 @@ from flask_cors import CORS
 from typing import Optional
 
 from flask import Flask
-from ifcparser import parse
-import db
+from .ifcparser import parse
+from . import db
 
 import ifcopenshell
 import ifcopenshell.file
