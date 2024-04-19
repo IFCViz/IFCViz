@@ -1,5 +1,7 @@
 Flask==2.2.2
+pytest==8.1.1
 Werkzeug==2.2.2
 ifcopenshell>=0.7
 psycopg[binary,pool]>=3.1.18
 lark>=1.1.9
+flask_cors
