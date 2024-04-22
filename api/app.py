@@ -69,9 +69,9 @@ def send(filehash: str):
 @app.route("/upload", methods=['POST'])
 def upload():
     print("Server got an upload request!");
+    ERROR_NO_CONT = make_response(json.dumps({'error': 'no content provided'}),     400)
     ERROR_NO_GZIP = make_response(json.dumps({'error': 'file not gzipped'}),        400)
     ERROR_NO_SAVE = make_response(json.dumps({'error': 'file cannot be saved'}),    500)
-    ERROR_F_EXIST = make_response(json.dumps({'error': 'file already exists'}),     500)
     ERROR_INVALID = make_response(json.dumps({'error': 'file is not ifc'}),         400)
 
     # KEEP THE CODE BELLOW IF SWITCHING TO FORM FILE UPLOAD STYLE!!!!!
@@ -85,7 +85,9 @@ def upload():
     # ================================================================
 
     contents: bytes = request.data
-    
+    if not contents:
+        return ERROR_NO_CONT
+
     gzip_file: gzip.GzipFile = gzip.GzipFile(fileobj=io.BytesIO(request.data), mode='rb')
     gzip_contents: Optional[bytes] = try_or_default(None)(gzip_file.read)()
     gzip_file.close()
