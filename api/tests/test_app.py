@@ -64,4 +64,20 @@ def test_upload():
     delete_analysis(res_is_gzip_is_ifc_2_res_json['fileid'])
 
 def test_send():
-    pass
+    res_empty = app.test_client().get('/receive/')
+    assert res_empty.status_code == 404
+
+    res_invalid_hash_1 = app.test_client().get('/receive/this-is-not-a-valid-hash')
+    assert res_invalid_hash_1.data == json.dumps(
+        {'error': 'invalid hash provided'}
+    ).encode('ASCII')
+    assert res_invalid_hash_1.status_code == 400
+
+    res_invalid_hash_2 = app.test_client().get(
+        '/receive/dca0031132879efd3c3441c4e25a3e5ae45cec424c79249d2d91273b50eec30c'
+    )
+    assert res_invalid_hash_2.data == json.dumps(
+        {'error': 'file does not exist'}
+    ).encode('ASCII')
+    assert res_invalid_hash_2.status_code == 400
+
