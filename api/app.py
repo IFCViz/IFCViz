@@ -89,10 +89,14 @@ def upload():
     gzip_file: gzip.GzipFile = gzip.GzipFile(fileobj=io.BytesIO(request.data), mode='rb')
     gzip_contents: Optional[bytes] = try_or_default(None)(gzip_file.read)()
     gzip_file.close()
-    
+
     if not gzip_contents:
         return ERROR_NO_GZIP
     
+    filename: str = sha256(contents).hexdigest()
+    if db.analysis_exists(filename):
+        return make_response(json.dumps({'fileid': filename}))
+
     model_reader_safe = try_or_default(None)(ifcopenshell.file().from_string)
     model: Optional[ifcopenshell.file] = model_reader_safe(gzip_contents.decode())
     logger: Optional[ifcopenshell.validate.json_logger] \
@@ -102,7 +106,6 @@ def upload():
     if error == -1:
         return ERROR_INVALID
 
-    filename: str = sha256(contents).hexdigest()
 
     analysis = parse(contents)
     db.new_analysis(filename, contents, analysis)
