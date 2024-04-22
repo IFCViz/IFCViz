@@ -1,4 +1,4 @@
-import os
+import re
 import io
 import json
 import gzip
@@ -20,6 +20,8 @@ app = Flask(__name__, template_folder='../webapp')
 CORS(app)
 app.secret_key = "super secret key"
 app.config['UPLOAD_FOLDER'] = 'uploads/'
+
+rsha256hash = re.compile(r"^[a-fA-F0-9]{64}$")
 
 
 def secure_filename(filename: str) -> str:
@@ -48,13 +50,19 @@ def dump_contents(contents: bytes, filename: str) -> bool:
 
 @app.route("/receive/<string:filehash>")
 def send(filehash: str):
+    ERROR_INVALID = make_response(json.dumps({'error': 'invalid hash provided'}),   400)
     ERROR_NO_FILE = make_response(json.dumps({'error': 'file does not exist'}),     400)
+
+    if not rsha256hash.fullmatch(filehash):
+        return ERROR_INVALID
 
     filename: str = secure_filename(filehash)
     if not db.analysis_exists(filename):
         return ERROR_NO_FILE
 
-    contents: bytes = db.get_file(filename)
+    c = db.get_file(filename)
+    print(c)
+    contents: io.BytesIO = io.BytesIO(c)
     return send_file(contents, mimetype='application/gzip', as_attachment=False)
 
 
@@ -107,11 +115,15 @@ def upload():
 
 @app.route("/metadata/<string:filehash>")
 def metadata(filehash: str):
-    ERROR_INVALID = make_response(json.dumps({'error': 'invalid hash provided'}),     400)
+    ERROR_INVALID = make_response(json.dumps({'error': 'invalid hash provided'}),   400)
+    ERROR_NO_FILE = make_response(json.dumps({'error': 'file does not exist'}),     400)
+
+    if not rsha256hash.fullmatch(filehash):
+        return ERROR_INVALID
 
     filename: str = secure_filename(filehash)
     if not db.analysis_exists(filename):
-        return ERROR_INVALID
+        return ERROR_NO_FILE
 
     return db.get_metadata(filehash)
 
