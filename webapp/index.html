@@ -71,7 +71,7 @@
             return (await response.json()).fileid;
         }
         async function get_metadata(file_hash){
-            let response = await fetch('http://localhost:5000/metadatt/' + file_hash, {
+            let response = await fetch('http://localhost:5000/metadata/' + file_hash, {
                 method: 'GET'
             });
             if(response.ok == false){

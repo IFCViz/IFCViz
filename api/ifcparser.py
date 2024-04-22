@@ -5,12 +5,12 @@ import json
 import gzip
 
 
-def parse(file_name):
+def parse(ifc_file_content):
     ERROR_NO_FLOORS = json.dumps({"error": "no floors found!"})
     
     model = None
-    with gzip.open(file_name) as gz:
-        model = ifcopenshell.file().from_string(gz.read().decode())
+    
+    model = ifcopenshell.file().from_string(gzip.decompress(ifc_file_content).decode())
 
     # Get model name
     model_name = "Some model name"
