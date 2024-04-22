@@ -46,23 +46,15 @@ def dump_contents(contents: bytes, filename: str) -> bool:
 
     return True
 
-@app.route("/testdb")
-def testdb():
-    return str(db.get_conn())
-
 @app.route("/receive/<string:filehash>")
 def send(filehash: str):
     ERROR_NO_FILE = make_response(json.dumps({'error': 'file does not exist'}),     400)
 
     filename: str = secure_filename(filehash)
-    # If implementing hash storage in DB use query instead of `os.path.isfile``
-    if not os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
+    if not db.analysis_exists(filename):
         return ERROR_NO_FILE
 
-    f = open(app.config['UPLOAD_FOLDER']+filename, 'rb')
-    contents: io.BytesIO = io.BytesIO(f.read())
-    f.close()
-
+    contents: bytes = db.get_file(filename)
     return send_file(contents, mimetype='application/gzip', as_attachment=False)
 
 
