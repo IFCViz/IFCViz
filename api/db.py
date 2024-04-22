@@ -37,6 +37,12 @@ def get_file(filehash):
     conn.close()
     return res
 
+def delete_analysis(filehash: str):
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM analysis WHERE id=%s", (format_hash(filehash),))
+    conn.close()
+
 def analysis_exists(filehash: str) -> bool:
     conn = get_conn()
     cur = conn.cursor()
