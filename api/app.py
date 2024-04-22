@@ -98,7 +98,7 @@ def welcome():
 
 @app.route("/test")
 def hello_world():
-    jsn = parse('../test_files/simple_house.ifc')
+    jsn = parse('../uploads/simple_house.ifc', dict())
     return f"<p>{jsn}</p>"
 
 
