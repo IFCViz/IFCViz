@@ -1,7 +1,8 @@
 import psycopg
 
-def format_hash(hash):
+def format_hash(hash: str) -> str:
     return "0x" + str(hash)[10]
+
 def get_conn():
     return psycopg.connect("dbname=postgres user=postgres host=localhost port=5432")
 
@@ -11,7 +12,7 @@ def new_analysis(filehash, file_content, parsed):
     conn.commit()
     conn.close()
 
-def get_analysis(filehash):
+def get_analysis(filehash: str):
     conn = get_conn()
     cur = conn.cursor()
     cur.execute("SELECT * FROM analysis WHERE id=%s", (format_hash(filehash),))
@@ -20,7 +21,7 @@ def get_analysis(filehash):
     return res
 
 
-def get_metadata(filehash):
+def get_metadata(filehash: str) -> str:
     conn = get_conn()
     cur = conn.cursor()
     cur.execute("SELECT * FROM analysis WHERE id=%s", (format_hash(filehash),))
@@ -29,7 +30,7 @@ def get_metadata(filehash):
     return res
 
 
-def get_file(filehash):
+def get_file(filehash: str) -> bytes:
     conn = get_conn()
     cur = conn.cursor()
     cur.execute("SELECT * FROM analysis WHERE id=%s", (format_hash(filehash),))
