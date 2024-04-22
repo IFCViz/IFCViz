@@ -1,6 +1,17 @@
 <html>
 <head>
     <script>
+
+        function create_error_message(message){
+            let text_box = document.createElement("div");
+            text_box.classList.add("error-message");
+
+            let text_element = document.createElement("p");
+            text_element.textContent = message;
+            text_box.appendChild(text_element);
+            document.body.appendChild(text_box);
+        }
+
 		function allowDrop(ev) {
             ev.preventDefault();
         }
@@ -53,16 +64,27 @@
                 body: blob
             });
             if(response.ok == false){
-                console.log("Error uploading file!!");
-                console.log(response_text.error);
+                create_error_message("Error uploading file!");
+                console.log(response.error);
                 return null;
             }
             return (await response.json()).fileid;
         }
-        
+        async function get_metadata(file_hash){
+            let response = await fetch('http://localhost:5000/metadatt/' + file_hash, {
+                method: 'GET'
+            });
+            if(response.ok == false){
+                create_error_message("Error! Could not get metadata!!");
+                console.log(response.error);
+                return null;
+            }
+            return await response.json();
+        }
+
         async function request_and_present(file_hash){
             const received_file = await request_file(file_hash);
-            await log_textfile(received_file);
+            //await log_textfile(received_file);
         }
         
         //A function that will upload a file, get the response, and present it in the client's browser
@@ -72,8 +94,8 @@
             
             //response.fileid is the hash
             await request_and_present(file_hash);
-
-
+            console.log(get_metadata(file_hash));
+            
             
             /*
             ifc_info = JSON.parse(response.value)["my_list"];
@@ -108,7 +130,8 @@
                 method: "GET"
             })
             if(response.ok == false){
-                console.error("Failed to get file");
+                create_error_message("Failed to recieve file");
+                console.error(response.error);
                 return null;
             }
             response = await response.blob();
@@ -127,7 +150,6 @@
 <body>
 <div id="app">
 	<!-- <button @click="count++">{{ count }}</button> -->
-
     <div
         id="droptarget" 
 	ondragover="allowDrop(event)"
@@ -140,8 +162,6 @@
     <div id="container">
 
     </div>
-
-    
 </div>
 
 <style>
@@ -202,6 +222,16 @@
         max-width: 600px;
         margin: 20px auto;
     }
+
+    .error-message{
+        width: 250px;
+        height: 20px;
+        background-color: black;
+        color: #ff0000; /* Red color for error messages */
+        font-weight: bold; /* Make the text bold */
+        margin-bottom: 10px; /* Add some bottom margin to separate messages */
+    }
+
 </style>
 </body>
 </html>

@@ -104,7 +104,7 @@ def upload():
 
     filename: str = sha256(contents).hexdigest()
     # If implementing hash storage in DB use query instead of `os.path.isfile``
-    db.new_analysis(filename, contents, parse(app.config['UPLOAD_FOLDER'] + filename))
+    #db.new_analysis(filename, contents, parse(app.config['UPLOAD_FOLDER'] + filename))
     if os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
         return make_response(json.dumps({'fileid': filename}), 200)
 

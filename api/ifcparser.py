@@ -7,7 +7,7 @@ import gzip
 
 def parse(file_name):
     ERROR_NO_FLOORS = json.dumps({"error": "no floors found!"})
-
+    
     model = None
     with gzip.open(file_name) as gz:
         model = ifcopenshell.file().from_string(gz.read().decode())
