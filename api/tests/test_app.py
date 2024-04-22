@@ -1,6 +1,9 @@
 import gzip
 import json
+import re
 from api.app import app, secure_filename
+
+from typing import Optional
 
 
 def test_secure_filename():
@@ -31,9 +34,21 @@ def test_upload():
     ).encode('ASCII')
     assert res_is_gzip_not_ifc.status_code == 400
 
-    
-
     # ================================================================================
+    ifc_sample: Optional[bytes] = None
+    with open('../ifc_test_files/simple_house.ifc', 'rb') as f:
+        ifc_sample = f.read()
+
+    res_is_gzip_is_ifc = app.test_client().post(
+        '/upload',
+        data=gzip.compress(ifc_sample)
+    )
+    resha256hash = re.compile(r"^[a-fA-F0-9]{64}$")
+    assert res_is_gzip_is_ifc.status == 200
+
+    res_is_gzip_is_ifc_res_json = json.loads(res_is_gzip_is_ifc.data.decode('ASCII'))
+    assert resha256hash.fullmatch(res_is_gzip_is_ifc_res_json.get('fileid', '')) != None
+
 
 def test_send():
     pass
