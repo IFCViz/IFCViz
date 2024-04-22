@@ -5,64 +5,34 @@ from typing import Optional
 def get_conn():
     return psycopg.connect("dbname=postgres user=postgres host=localhost port=5432")
 
-def new_analysis(filehash, file_content, parsed) -> bool:
-    try:
-        conn = get_conn()
-        cur = conn.cursor()
-
-        q: str = "INSERT INTO analysis (id, ifc_file, parsed) VALUES (%s, %s, %s)"
-        cur.execute(q, (filehash, file_content, parsed))
-        conn.commit()
-        conn.close()
-        return True
-    except:
-        return False
-
-def get_analysis(filehash: str) -> Optional[psycopg.rows.TupleRow]:
-    try:
-        conn = get_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM analysis WHERE id=%s", (filehash,))
-        res = cur.fetchone()
-        conn.close()
-        return res
-    except:
-        return None
-
-
-def get_metadata(filehash: str) -> Optional[str]:
-    try:
-        conn = get_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM analysis WHERE id=%s", (filehash,))
-        res = cur.fetchone()[2]
-        conn.close()
-        return res
-    except:
-        return None
-
-
-def get_file(filehash: str) -> Optional[bytes]:
+def query_one_row(query_str, tuple):
     conn = get_conn()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM analysis WHERE id=%s", (filehash,))
-    res = cur.fetchone()[1]
+    cur.execute("SELECT * FROM analysis WHERE id=%s", (format_hash(filehash),))
+    res = cur.fetchone()
+    conn.commit()
     conn.close()
     return res
 
+
+def new_analysis(filehash, file_content, parsed):
+    query_one_row.execute("INSERT INTO analysis (id, ifc_file, parsed) VALUES (%s, %s, %s)", (format_hash(filehash), file_content, parsed))
+
+
+def get_analysis(filehash):
+    return query_one_row("SELECT * FROM analysis WHERE id=%s", (format_hash(filehash),))
+
+
+def get_metadata(filehash):
+    return query_one_row("SELECT * FROM analysis WHERE id=%s", (format_hash(filehash),))[2]
+
+
+def get_file(filehash):
+    return query_one_row("SELECT * FROM analysis WHERE id=%s", (format_hash(filehash),))[1]
+
 def delete_analysis(filehash: str):
-    conn = get_conn()
-    cur = conn.cursor()
-    cur.execute("DELETE FROM analysis WHERE id=%s", (filehash,))
-    conn.close()
+    return query_one_row("DELETE FROM analysis WHERE id=%s", (format_hash(filehash),))
 
 def analysis_exists(filehash: str) -> bool:
-    try:
-        conn = get_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM analysis WHERE id=%s", (filehash,))
-        res = cur.fetchone()
-        conn.close()
-        return res != None
-    except:
-        return False
+    res = query_one_row("SELECT * FROM analysis WHERE id=%s", (format_hash(filehash),))
+    return res != None
