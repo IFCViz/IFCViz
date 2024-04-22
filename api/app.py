@@ -68,10 +68,8 @@ def send(filehash: str):
 
 @app.route("/upload", methods=['POST'])
 def upload():
-    print("Server got an upload request!");
     ERROR_NO_CONT = make_response(json.dumps({'error': 'no content provided'}),     400)
     ERROR_NO_GZIP = make_response(json.dumps({'error': 'file not gzipped'}),        400)
-    ERROR_NO_SAVE = make_response(json.dumps({'error': 'file cannot be saved'}),    500)
     ERROR_INVALID = make_response(json.dumps({'error': 'file is not ifc'}),         400)
 
     # KEEP THE CODE BELLOW IF SWITCHING TO FORM FILE UPLOAD STYLE!!!!!
@@ -105,29 +103,21 @@ def upload():
         return ERROR_INVALID
 
     filename: str = sha256(contents).hexdigest()
-    # If implementing hash storage in DB use query instead of `os.path.isfile``
 
     analysis = parse(contents)
     db.new_analysis(filename, contents, analysis)
-    # TODO: add db.exists() to replace these
-   ## if os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
-    ##    return ERROR_F_EXIST
-
-    ##if not try_or_default(False)(dump_contents)(contents, filename):
-   ##     return ERROR_NO_SAVE
 
     return make_response(json.dumps({'fileid': filename}), 200)
 
 
 @app.route("/metadata/<string:filehash>")
 def metadata(filehash: str):
-    #ERROR_NO_FILE = make_response(json.dumps({'error': 'file does not exist'}),     400)
+    ERROR_INVALID = make_response(json.dumps({'error': 'invalid hash provided'}),     400)
 
     filename: str = secure_filename(filehash)
-    # TODO: implement db.exists() and replace this check
-    #if not os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
-    #   return ERROR_NO_FILE
-    
+    if not db.analysis_exists(filename):
+        return ERROR_INVALID
+
     return db.get_metadata(filehash)
 
 @app.route("/", methods=["GET"])
