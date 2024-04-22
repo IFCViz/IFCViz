@@ -106,26 +106,29 @@ def upload():
 
     filename: str = sha256(contents).hexdigest()
     # If implementing hash storage in DB use query instead of `os.path.isfile``
-    db.new_analysis(filename, contents, parse(app.config['UPLOAD_FOLDER'] + filename))
-    if os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
-        return make_response(json.dumps({'fileid': filename}), 200)
 
-    if not try_or_default(False)(dump_contents)(contents, filename):
-        return ERROR_NO_SAVE
+    analysis = parse(contents)
+    db.new_analysis(filename, contents, analysis)
+    # TODO: add db.exists() to replace these
+   ## if os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
+    ##    return ERROR_F_EXIST
+
+    ##if not try_or_default(False)(dump_contents)(contents, filename):
+   ##     return ERROR_NO_SAVE
 
     return make_response(json.dumps({'fileid': filename}), 200)
 
 
 @app.route("/metadata/<string:filehash>")
 def metadata(filehash: str):
-    ERROR_NO_FILE = make_response(json.dumps({'error': 'file does not exist'}),     400)
+    #ERROR_NO_FILE = make_response(json.dumps({'error': 'file does not exist'}),     400)
 
     filename: str = secure_filename(filehash)
-    # If implementing hash storage in DB use query instead of `os.path.isfile``
-    if not os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
-        return ERROR_NO_FILE
+    # TODO: implement db.exists() and replace this check
+    #if not os.path.isfile(app.config['UPLOAD_FOLDER']+filename):
+    #   return ERROR_NO_FILE
     
-    return parse(app.config['UPLOAD_FOLDER'] + filename)
+    return db.get_metadata(filehash)
 
 @app.route("/", methods=["GET"])
 def parsing_result():
