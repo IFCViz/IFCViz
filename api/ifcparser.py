@@ -42,7 +42,7 @@ def parse(ifc_file_content, surface_type = "FLOOR"):
     if len(surfaces) == 0:
         return ERROR_NO_FLOORS
 
-    # 
+    # Put the analysis of surfaces into a json string and return it
     for surface in surfaces:
         # Get the right properties
         properties = ifcopenshell.util.element.get_psets(surface)
