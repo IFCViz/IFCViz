@@ -1,8 +1,10 @@
 import gzip
 import json
 import re
+from hashlib import sha256
+
 from api.app import app, secure_filename
-from api.db import delete_analysis
+from api.db import delete_analysis, new_analysis
 
 from typing import Optional
 
@@ -15,25 +17,25 @@ def test_secure_filename():
 
 def test_upload():
     res_empty = app.test_client().post('/upload')
+    assert res_empty.status_code == 400
     assert res_empty.data == json.dumps(
         {'error': 'no content provided'}
     ).encode('ASCII')
-    assert res_empty.status_code == 400
 
     res_not_gzip = app.test_client().post('/upload', data=b'not in gzip format')
+    assert res_not_gzip.status_code == 400
     assert res_not_gzip.data == json.dumps(
         {'error': 'file not gzipped'}
     ).encode("ASCII")
-    assert res_not_gzip.status_code == 400
 
     res_is_gzip_not_ifc = app.test_client().post(
         '/upload',
         data=gzip.compress(b'not ifc')
     )
+    assert res_is_gzip_not_ifc.status_code == 400
     assert res_is_gzip_not_ifc.data == json.dumps(
         {'error': 'file is not ifc'}
     ).encode('ASCII')
-    assert res_is_gzip_not_ifc.status_code == 400
 
     # ================================================================================
     rsha256hash = re.compile(r"^[a-fA-F0-9]{64}$")
@@ -68,16 +70,33 @@ def test_send():
     assert res_empty.status_code == 404
 
     res_invalid_hash_1 = app.test_client().get('/receive/this-is-not-a-valid-hash')
+    assert res_invalid_hash_1.status_code == 400
     assert res_invalid_hash_1.data == json.dumps(
         {'error': 'invalid hash provided'}
     ).encode('ASCII')
-    assert res_invalid_hash_1.status_code == 400
 
     res_invalid_hash_2 = app.test_client().get(
         '/receive/dca0031132879efd3c3441c4e25a3e5ae45cec424c79249d2d91273b50eec30c'
     )
+    assert res_invalid_hash_2.status_code == 400
     assert res_invalid_hash_2.data == json.dumps(
         {'error': 'file does not exist'}
     ).encode('ASCII')
-    assert res_invalid_hash_2.status_code == 400
 
+    # ================================================================================
+
+    ifc_sample: Optional[bytes] = None
+    with open('../ifc_test_files/simple_house.ifc', 'rb') as f:
+        ifc_sample = gzip.compress(f.read())
+
+    ifc_hash: str = sha256(ifc_sample).hexdigest()
+    new_analysis(ifc_hash, ifc_sample, 'this is some analysis data')
+
+    res_ifc_file = app.test_client().get('/receive/'+ifc_hash)
+    assert res_ifc_file.status_code == 200
+    assert ifc_sample == res_ifc_file.data
+
+    delete_analysis(ifc_hash)
+
+def test_metadata():
+    pass
