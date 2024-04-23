@@ -32,9 +32,21 @@ def get_metadata(filehash):
 def get_file(filehash):
     conn = get_conn()
     cur = conn.cursor()
-    conn.cursor().execute("SELECT * FROM analysis WHERE id=%s", (format_hash(filehash),))
+    cur.execute("SELECT * FROM analysis WHERE id=%s", (format_hash(filehash),))
     res = cur.fetchone()[1]
     conn.close()
     return res
 
+def delete_analysis(filehash: str):
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM analysis WHERE id=%s", (format_hash(filehash),))
+    conn.close()
 
+def analysis_exists(filehash: str) -> bool:
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM analysis WHERE id=%s", (format_hash(filehash),))
+    res = cur.fetchone()
+    conn.close()
+    return res != None

@@ -1,7 +1,6 @@
 <html>
 <head>
     <script>
-
         function create_error_message(message){
             let text_box = document.createElement("div");
             text_box.classList.add("error-message");
@@ -11,6 +10,32 @@
             text_box.appendChild(text_element);
             document.body.appendChild(text_box);
         }
+
+        function display_floors(model){
+            let floor_box = document.createElement("div");
+            floor_box.id = "ifc-information-container";
+        
+            let label = document.createElement("h4");
+            label.id = "ifc-information-container-label";
+            label.textContent = "Floor Information";
+            floor_box.appendChild(label);
+
+            let floors = model.floors;
+            console.log(model, floors);
+            for (const [i, v] of floors.entries()){
+                let text_element = document.createElement("p");
+                text_element.textContent = JSON.stringify(v);
+                floor_box.appendChild(text_element);
+            }
+            document.body.appendChild(floor_box);
+        }
+
+        function display_extraction(extraction){
+            let model_name = "Some model name";
+            let model = extraction[model_name];
+            display_floors(model);
+        }
+
 
 		function allowDrop(ev) {
             ev.preventDefault();
@@ -79,7 +104,9 @@
                 console.log(response.error);
                 return null;
             }
-            return await response.json();
+
+            let extraction = await response.json();
+            return extraction;
         }
 
         async function request_and_present(file_hash){
@@ -94,8 +121,8 @@
             
             //response.fileid is the hash
             await request_and_present(file_hash);
-            console.log(get_metadata(file_hash));
-            
+            console.log(await get_metadata(file_hash));
+            display_extraction(await get_metadata(file_hash));
             
             /*
             ifc_info = JSON.parse(response.value)["my_list"];
@@ -212,6 +239,28 @@
         padding: 20px;
         margin-top: 20px;
         cursor: pointer;
+    }
+
+    #ifc-information-container{
+        border: 2px dashed #ccc;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    
+    #ifc-information-container-label{
+        font-size: 16px;
+        background-color: #ebeff5;
+        border-radius: 10px;
+        /* border-width: 2px; */
+        border-color: f5f5f5;
+        /* border-style: dashed; */
+        text-align: center;
+        padding-top: 0px;
+        margin-top: 0px;
+    }
+
+    .ifc-information{
+        text-align: left;
     }
 
     pre {
