@@ -69,7 +69,7 @@ def test_upload():
     assert hash1 == hash2
 
     print(hash1)
-    # delete_analysis(hash1)
+    delete_analysis(hash1)
 
 def test_send():
     res_empty = app.test_client().get('/receive/')
