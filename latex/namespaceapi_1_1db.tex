@@ -1,0 +1,82 @@
+\doxysection{api.\+db Namespace Reference}
+\hypertarget{namespaceapi_1_1db}{}\label{namespaceapi_1_1db}\index{api.db@{api.db}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespaceapi_1_1db_a1ad3dd119567ddce16856f46a728ff0d}{get\+\_\+conn}} ()
+\item 
+Optional\mbox{[}Tuple\+Row\mbox{]} \mbox{\hyperlink{namespaceapi_1_1db_a21a20beddec48d89580a58b3620371f4}{query\+\_\+one\+\_\+row}} (str query, tuple tuple, bool result=True)
+\item 
+\mbox{\hyperlink{namespaceapi_1_1db_a0b121b4f734209426d5136beb3a52575}{new\+\_\+analysis}} (str filehash, bytes file\+\_\+content, str parsed)
+\item 
+\mbox{\hyperlink{namespaceapi_1_1db_a7cdd0462018faa966f5f4bf4d32944d3}{get\+\_\+analysis}} (filehash)
+\item 
+\mbox{\hyperlink{namespaceapi_1_1db_a6a7a8667a2729faf395f7c7d9d287878}{get\+\_\+metadata}} (filehash)
+\item 
+\mbox{\hyperlink{namespaceapi_1_1db_a296bc7f02411f3b8feea8a20b295949d}{get\+\_\+file}} (filehash)
+\item 
+\mbox{\hyperlink{namespaceapi_1_1db_a14584b79a7bc02334d36c76154f5c759}{delete\+\_\+analysis}} (str filehash)
+\item 
+bool \mbox{\hyperlink{namespaceapi_1_1db_afb7197d5e6021608e6aebb87c0f0d4a2}{analysis\+\_\+exists}} (str filehash)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}## db.py
+###This module provides primitives for interacting with the IFCViz database.  
+  
+IFCViz requires a postgresql database to be running at ``port 5432`` with default
+credentials on the same host as the server. For more information about configuring
+and running postgresql with docker, see (set up postgres)[postgres.html]
+\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespaceapi_1_1db_afb7197d5e6021608e6aebb87c0f0d4a2}\label{namespaceapi_1_1db_afb7197d5e6021608e6aebb87c0f0d4a2} 
+\index{api.db@{api.db}!analysis\_exists@{analysis\_exists}}
+\index{analysis\_exists@{analysis\_exists}!api.db@{api.db}}
+\doxysubsubsection{\texorpdfstring{analysis\_exists()}{analysis\_exists()}}
+{\footnotesize\ttfamily  bool api.\+db.\+analysis\+\_\+exists (\begin{DoxyParamCaption}\item[{str}]{filehash }\end{DoxyParamCaption})}
+
+\Hypertarget{namespaceapi_1_1db_a14584b79a7bc02334d36c76154f5c759}\label{namespaceapi_1_1db_a14584b79a7bc02334d36c76154f5c759} 
+\index{api.db@{api.db}!delete\_analysis@{delete\_analysis}}
+\index{delete\_analysis@{delete\_analysis}!api.db@{api.db}}
+\doxysubsubsection{\texorpdfstring{delete\_analysis()}{delete\_analysis()}}
+{\footnotesize\ttfamily api.\+db.\+delete\+\_\+analysis (\begin{DoxyParamCaption}\item[{str}]{filehash }\end{DoxyParamCaption})}
+
+\Hypertarget{namespaceapi_1_1db_a7cdd0462018faa966f5f4bf4d32944d3}\label{namespaceapi_1_1db_a7cdd0462018faa966f5f4bf4d32944d3} 
+\index{api.db@{api.db}!get\_analysis@{get\_analysis}}
+\index{get\_analysis@{get\_analysis}!api.db@{api.db}}
+\doxysubsubsection{\texorpdfstring{get\_analysis()}{get\_analysis()}}
+{\footnotesize\ttfamily api.\+db.\+get\+\_\+analysis (\begin{DoxyParamCaption}\item[{}]{filehash }\end{DoxyParamCaption})}
+
+\Hypertarget{namespaceapi_1_1db_a1ad3dd119567ddce16856f46a728ff0d}\label{namespaceapi_1_1db_a1ad3dd119567ddce16856f46a728ff0d} 
+\index{api.db@{api.db}!get\_conn@{get\_conn}}
+\index{get\_conn@{get\_conn}!api.db@{api.db}}
+\doxysubsubsection{\texorpdfstring{get\_conn()}{get\_conn()}}
+{\footnotesize\ttfamily api.\+db.\+get\+\_\+conn (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\Hypertarget{namespaceapi_1_1db_a296bc7f02411f3b8feea8a20b295949d}\label{namespaceapi_1_1db_a296bc7f02411f3b8feea8a20b295949d} 
+\index{api.db@{api.db}!get\_file@{get\_file}}
+\index{get\_file@{get\_file}!api.db@{api.db}}
+\doxysubsubsection{\texorpdfstring{get\_file()}{get\_file()}}
+{\footnotesize\ttfamily api.\+db.\+get\+\_\+file (\begin{DoxyParamCaption}\item[{}]{filehash }\end{DoxyParamCaption})}
+
+\Hypertarget{namespaceapi_1_1db_a6a7a8667a2729faf395f7c7d9d287878}\label{namespaceapi_1_1db_a6a7a8667a2729faf395f7c7d9d287878} 
+\index{api.db@{api.db}!get\_metadata@{get\_metadata}}
+\index{get\_metadata@{get\_metadata}!api.db@{api.db}}
+\doxysubsubsection{\texorpdfstring{get\_metadata()}{get\_metadata()}}
+{\footnotesize\ttfamily api.\+db.\+get\+\_\+metadata (\begin{DoxyParamCaption}\item[{}]{filehash }\end{DoxyParamCaption})}
+
+\Hypertarget{namespaceapi_1_1db_a0b121b4f734209426d5136beb3a52575}\label{namespaceapi_1_1db_a0b121b4f734209426d5136beb3a52575} 
+\index{api.db@{api.db}!new\_analysis@{new\_analysis}}
+\index{new\_analysis@{new\_analysis}!api.db@{api.db}}
+\doxysubsubsection{\texorpdfstring{new\_analysis()}{new\_analysis()}}
+{\footnotesize\ttfamily api.\+db.\+new\+\_\+analysis (\begin{DoxyParamCaption}\item[{str}]{filehash,  }\item[{bytes}]{file\+\_\+content,  }\item[{str}]{parsed }\end{DoxyParamCaption})}
+
+\Hypertarget{namespaceapi_1_1db_a21a20beddec48d89580a58b3620371f4}\label{namespaceapi_1_1db_a21a20beddec48d89580a58b3620371f4} 
+\index{api.db@{api.db}!query\_one\_row@{query\_one\_row}}
+\index{query\_one\_row@{query\_one\_row}!api.db@{api.db}}
+\doxysubsubsection{\texorpdfstring{query\_one\_row()}{query\_one\_row()}}
+{\footnotesize\ttfamily  Optional\mbox{[}Tuple\+Row\mbox{]} api.\+db.\+query\+\_\+one\+\_\+row (\begin{DoxyParamCaption}\item[{str}]{query,  }\item[{tuple}]{tuple,  }\item[{bool }]{result = {\ttfamily True} }\end{DoxyParamCaption})}
+
