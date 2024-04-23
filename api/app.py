@@ -1,3 +1,7 @@
+"""
+A module that implements api routing and core business logic for the IFCViz backend. 
+"""
+
 import re
 import io
 import json
@@ -16,6 +20,8 @@ import ifcopenshell.file
 import ifcopenshell.validate
 
 
+
+
 app = Flask(__name__, template_folder='../webapp')
 CORS(app)
 app.secret_key = "super secret key"
@@ -28,9 +34,10 @@ def secure_filename(filename: str) -> str:
     return "".join(x for x in filename if x.isalnum())
 
 
-# Function wrapper, returns `default` if exception rises in `f`. Must have
-# ..since Flask ignores try/except and raises the catched error
+
 def try_or_default(default):
+    ''' Function wrapper, returns `default` if an exception is raised in the function `f`. This is required
+        due to Flask raising exceptions even when they are caught in an except block'''
     def wrap(f):
         def inner(*args, **kwargs):
             try:
@@ -41,8 +48,10 @@ def try_or_default(default):
     return wrap
 
 
-# Helper to prevent try/catch inside Flask app
 def dump_contents(contents: bytes, filename: str) -> bool:
+    '''
+    Helper to prevent try/catch inside Flask app 
+    '''
     with open(app.config['UPLOAD_FOLDER']+filename, 'wb') as f:
         f.write(contents)
 
@@ -50,6 +59,10 @@ def dump_contents(contents: bytes, filename: str) -> bool:
 
 @app.route("/receive/<string:filehash>")
 def send(filehash: str):
+    """
+    Implements the GET endpoint /receive/<string:filehash>, a route that 
+    allows for the download of an IFC file with a given hash.
+    """
     ERROR_INVALID = make_response(json.dumps({'error': 'invalid hash provided'}),   400)
     ERROR_NO_FILE = make_response(json.dumps({'error': 'file does not exist'}),     400)
 
@@ -68,6 +81,10 @@ def send(filehash: str):
 
 @app.route("/upload", methods=['POST'])
 def upload():
+    """
+    Implements the POST endpoint /upload/, which will store and analyze an IFC file and
+    return its hash for future reference to the file. 
+    """
     ERROR_NO_CONT = make_response(json.dumps({'error': 'no content provided'}),     400)
     ERROR_NO_GZIP = make_response(json.dumps({'error': 'file not gzipped'}),        400)
     ERROR_INVALID = make_response(json.dumps({'error': 'file is not ifc'}),         400)
