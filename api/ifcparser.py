@@ -1,3 +1,8 @@
+"""
+This module implements the core parsing logic for the IFCViz project. 
+"""
+
+
 import ifcopenshell
 import ifcopenshell.file
 import ifcopenshell.util.element
@@ -6,6 +11,10 @@ import gzip
 
 
 def parse(ifc_file_content):
+    """
+    ifc_file_content: a gziped bytes object of IFC file data. 
+    returns: JSON formatted information about the building contained in the IFC file.
+    """
     ERROR_NO_FLOORS = json.dumps({"error": "no floors found!"})
     
     model = None

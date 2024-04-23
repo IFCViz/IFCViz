@@ -1,0 +1,109 @@
+\doxysection{api.\+app Namespace Reference}
+\hypertarget{namespaceapi_1_1app}{}\label{namespaceapi_1_1app}\index{api.app@{api.app}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+str \mbox{\hyperlink{namespaceapi_1_1app_a30b50637d655f428137bfdadf309e6a7}{secure\+\_\+filename}} (str filename)
+\item 
+\mbox{\hyperlink{namespaceapi_1_1app_ac6f075b8e5e2275a584f3bbc891e1fc3}{try\+\_\+or\+\_\+default}} (default)
+\item 
+bool \mbox{\hyperlink{namespaceapi_1_1app_acde445a6efe93ff6b33fbff9a18304b6}{dump\+\_\+contents}} (bytes contents, str filename)
+\item 
+\mbox{\hyperlink{namespaceapi_1_1app_a3c2c896ee55788ec9d09e63c24709a4e}{send}} (str filehash)
+\item 
+\mbox{\hyperlink{namespaceapi_1_1app_ac0b31bc1df21979cd5200a205fe21cb4}{upload}} ()
+\item 
+\mbox{\hyperlink{namespaceapi_1_1app_a18049bbde074177e7510ff443f53882b}{metadata}} (str filehash)
+\item 
+\mbox{\hyperlink{namespaceapi_1_1app_a19d5cc42e049ba5fab06ee5cc55a0986}{parsing\+\_\+result}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespaceapi_1_1app_af539acf96b123b092913c3b972d45f8d}{app}} = Flask(\+\_\+\+\_\+name\+\_\+\+\_\+, template\+\_\+folder=\textquotesingle{}../webapp\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespaceapi_1_1app_a56a8ed779749a77078562ad87be4fe04}{secret\+\_\+key}}
+\item 
+\mbox{\hyperlink{namespaceapi_1_1app_a5e9d55619d43d08c77aa9fed9daf7682}{rsha256hash}} = re.\+compile(r"{}\texorpdfstring{$^\wedge$}{\string^}\mbox{[}a-\/fA-\/F0-\/9\mbox{]}\{64\}\$"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}A module that implements api routing and core business logic for the IFCViz backend. 
+\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespaceapi_1_1app_acde445a6efe93ff6b33fbff9a18304b6}\label{namespaceapi_1_1app_acde445a6efe93ff6b33fbff9a18304b6} 
+\index{api.app@{api.app}!dump\_contents@{dump\_contents}}
+\index{dump\_contents@{dump\_contents}!api.app@{api.app}}
+\doxysubsubsection{\texorpdfstring{dump\_contents()}{dump\_contents()}}
+{\footnotesize\ttfamily  bool api.\+app.\+dump\+\_\+contents (\begin{DoxyParamCaption}\item[{bytes}]{contents,  }\item[{str}]{filename }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Helper to prevent try/catch inside Flask app 
+\end{DoxyVerb}
+ \Hypertarget{namespaceapi_1_1app_a18049bbde074177e7510ff443f53882b}\label{namespaceapi_1_1app_a18049bbde074177e7510ff443f53882b} 
+\index{api.app@{api.app}!metadata@{metadata}}
+\index{metadata@{metadata}!api.app@{api.app}}
+\doxysubsubsection{\texorpdfstring{metadata()}{metadata()}}
+{\footnotesize\ttfamily api.\+app.\+metadata (\begin{DoxyParamCaption}\item[{str}]{filehash }\end{DoxyParamCaption})}
+
+\Hypertarget{namespaceapi_1_1app_a19d5cc42e049ba5fab06ee5cc55a0986}\label{namespaceapi_1_1app_a19d5cc42e049ba5fab06ee5cc55a0986} 
+\index{api.app@{api.app}!parsing\_result@{parsing\_result}}
+\index{parsing\_result@{parsing\_result}!api.app@{api.app}}
+\doxysubsubsection{\texorpdfstring{parsing\_result()}{parsing\_result()}}
+{\footnotesize\ttfamily api.\+app.\+parsing\+\_\+result (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\Hypertarget{namespaceapi_1_1app_a30b50637d655f428137bfdadf309e6a7}\label{namespaceapi_1_1app_a30b50637d655f428137bfdadf309e6a7} 
+\index{api.app@{api.app}!secure\_filename@{secure\_filename}}
+\index{secure\_filename@{secure\_filename}!api.app@{api.app}}
+\doxysubsubsection{\texorpdfstring{secure\_filename()}{secure\_filename()}}
+{\footnotesize\ttfamily  str api.\+app.\+secure\+\_\+filename (\begin{DoxyParamCaption}\item[{str}]{filename }\end{DoxyParamCaption})}
+
+\Hypertarget{namespaceapi_1_1app_a3c2c896ee55788ec9d09e63c24709a4e}\label{namespaceapi_1_1app_a3c2c896ee55788ec9d09e63c24709a4e} 
+\index{api.app@{api.app}!send@{send}}
+\index{send@{send}!api.app@{api.app}}
+\doxysubsubsection{\texorpdfstring{send()}{send()}}
+{\footnotesize\ttfamily api.\+app.\+send (\begin{DoxyParamCaption}\item[{str}]{filehash }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Implements the GET endpoint /receive/<string:filehash>, a route that 
+allows for the download of an IFC file with a given hash.
+\end{DoxyVerb}
+ \Hypertarget{namespaceapi_1_1app_ac6f075b8e5e2275a584f3bbc891e1fc3}\label{namespaceapi_1_1app_ac6f075b8e5e2275a584f3bbc891e1fc3} 
+\index{api.app@{api.app}!try\_or\_default@{try\_or\_default}}
+\index{try\_or\_default@{try\_or\_default}!api.app@{api.app}}
+\doxysubsubsection{\texorpdfstring{try\_or\_default()}{try\_or\_default()}}
+{\footnotesize\ttfamily api.\+app.\+try\+\_\+or\+\_\+default (\begin{DoxyParamCaption}\item[{}]{default }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb} Function wrapper, returns `default` if an exception is raised in the function `f`. This is required
+    due to Flask raising exceptions even when they are caught in an except block\end{DoxyVerb}
+ \Hypertarget{namespaceapi_1_1app_ac0b31bc1df21979cd5200a205fe21cb4}\label{namespaceapi_1_1app_ac0b31bc1df21979cd5200a205fe21cb4} 
+\index{api.app@{api.app}!upload@{upload}}
+\index{upload@{upload}!api.app@{api.app}}
+\doxysubsubsection{\texorpdfstring{upload()}{upload()}}
+{\footnotesize\ttfamily api.\+app.\+upload (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Implements the POST endpoint /upload/, which will store and analyze an IFC file and
+return its hash for future reference to the file. 
+\end{DoxyVerb}
+ 
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespaceapi_1_1app_af539acf96b123b092913c3b972d45f8d}\label{namespaceapi_1_1app_af539acf96b123b092913c3b972d45f8d} 
+\index{api.app@{api.app}!app@{app}}
+\index{app@{app}!api.app@{api.app}}
+\doxysubsubsection{\texorpdfstring{app}{app}}
+{\footnotesize\ttfamily api.\+app.\+app = Flask(\+\_\+\+\_\+name\+\_\+\+\_\+, template\+\_\+folder=\textquotesingle{}../webapp\textquotesingle{})}
+
+\Hypertarget{namespaceapi_1_1app_a5e9d55619d43d08c77aa9fed9daf7682}\label{namespaceapi_1_1app_a5e9d55619d43d08c77aa9fed9daf7682} 
+\index{api.app@{api.app}!rsha256hash@{rsha256hash}}
+\index{rsha256hash@{rsha256hash}!api.app@{api.app}}
+\doxysubsubsection{\texorpdfstring{rsha256hash}{rsha256hash}}
+{\footnotesize\ttfamily api.\+app.\+rsha256hash = re.\+compile(r"{}\texorpdfstring{$^\wedge$}{\string^}\mbox{[}a-\/fA-\/F0-\/9\mbox{]}\{64\}\$"{})}
+
+\Hypertarget{namespaceapi_1_1app_a56a8ed779749a77078562ad87be4fe04}\label{namespaceapi_1_1app_a56a8ed779749a77078562ad87be4fe04} 
+\index{api.app@{api.app}!secret\_key@{secret\_key}}
+\index{secret\_key@{secret\_key}!api.app@{api.app}}
+\doxysubsubsection{\texorpdfstring{secret\_key}{secret\_key}}
+{\footnotesize\ttfamily api.\+app.\+secret\+\_\+key}
+
