@@ -51,11 +51,11 @@ def new_analysis(filehash: str, file_content: bytes, parsed: str):
 
 
 def get_analysis(filehash):
-    return query_one_row("SELECT * FROM analysis WHERE id=%s", (filehash,), False)
+    return query_one_row("SELECT * FROM analysis WHERE id=%s", (filehash,))
 
 
 def get_metadata(filehash):
-    return query_one_row("SELECT * FROM analysis WHERE id=%s", (filehash,), False)[2]
+    return query_one_row("SELECT * FROM analysis WHERE id=%s", (filehash,))[2]
 
 
 def get_file(filehash):
