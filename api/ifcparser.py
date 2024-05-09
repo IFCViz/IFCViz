@@ -9,79 +9,73 @@ import ifcopenshell.util.element
 import json
 import gzip
 
-def surface_type_to_string(st):
-    match st.upper():
-        case "FLOOR":
-            return "floors"
-        case "WINDOW":
-            return "windows"
-        case "WALL":
-            return "windows"
-        case _:
-            return f"bad surface type: {st}"
 
-def parse(ifc_file_content, surface_type = "FLOOR"):
+class IFCObject:
+    json_dict = dict()
+    surfaces = []
+
+    def __init__(self, model, surface_type, name="Some model name"):
+        self.model = model
+        self.name = name
+        self.surface_type = surface_type
+        self.json_dict = {self.name: {self.surface_type: []}}
+
+    def parse(self):
+        pass
+
+    def get_by_area_type(self, area_type):
+        # Put the analysis of surfaces into a json string and return it
+        for surface in self.surfaces:
+            # Get the right properties
+            properties = ifcopenshell.util.element.get_psets(surface)
+            base_properties = properties["BaseQuantities"]
+
+            self.json_dict[self.name][self.surface_type].append(
+                {surface.Name: base_properties[area_type]})
+            # result += f"Object name: {floor.Name}<br>"
+            # result += f"&emsp;&emsp;Area: {base_properties['GrossArea']} m^2<br>"
+
+
+class Floor(IFCObject):
+    def parse(self):
+        self.surfaces = [floor for floor in self.model.by_type('IfcSlab') if
+                         ifcopenshell.util.element.get_predefined_type(floor) == "FLOOR"]
+
+        self.get_by_area_type("GrossArea")
+
+
+class Window(IFCObject):
+
+    def parse(self):
+        self.surfaces = [floor for floor in self.model.by_type('IfcSlab') if
+                         ifcopenshell.util.element.get_predefined_type(floor) == "FLOOR"]
+
+        self.get_by_area_type("GrossArea")
+
+
+class Wall(IFCObject):
+
+    def parse(self):
+        self.surfaces = [floor for floor in self.model.by_type('IfcSlab') if
+                         ifcopenshell.util.element.get_predefined_type(floor) == "FLOOR"]
+
+        self.get_by_area_type("GrossSideArea")
+
+
+def parse(ifc_file_content, surface_type = "floor"):
     ERROR_NO_FLOORS = json.dumps({"error": "no floors found!"})
     ERROR_BAD_SURFACE_TYPE = json.dumps({"error": f"bad surface type: {surface_type}"})
     # ERROR_NYI = json.dumps({"error"})
 
-    model = None
-    
     model = ifcopenshell.file().from_string(gzip.decompress(ifc_file_content).decode())
 
-    # Get model name
-    model_name = "Some model name"
-    # Make the name cleaner
-    # model_name = model_name.split(".")[0].replace("_", " ").replace("-", " ").title()
-    # print(model_name)
-    json_dict = {model_name: {surface_type_to_string(surface_type): []}}
+    types = {
+        "floors": Floor(model, surface_type),
+        "windows": Window(model, surface_type),
+        "walls": Wall(model, surface_type),
+    }
 
-    # Define a list of the surfaces we're trying to analyze
-    surfaces = []
-    match (surface_type.upper()):
-        case "FLOOR":
-            surfaces = [floor for floor in model.by_type('IfcSlab') if ifcopenshell.util.element.get_predefined_type(floor) == "FLOOR"]
-
-            # Put the analysis of surfaces into a json string and return it
-            for surface in surfaces:
-                # Get the right properties
-                properties = ifcopenshell.util.element.get_psets(surface)
-                base_properties = properties["BaseQuantities"]
-
-                json_dict[model_name][surface_type_to_string(surface_type)].append(
-                    {surface.Name: base_properties['GrossArea']})
-                # result += f"Object name: {floor.Name}<br>"
-                # result += f"&emsp;&emsp;Area: {base_properties['GrossArea']} m^2<br>"
-        case "WINDOW":
-            surfaces = model.by_type('IfcWindow')
-
-            # Put the analysis of surfaces into a json string and return it
-            for surface in surfaces:
-                # Get the right properties
-                properties = ifcopenshell.util.element.get_psets(surface)
-                base_properties = properties["BaseQuantities"]
-
-                json_dict[model_name][surface_type_to_string(surface_type)].append(
-                    {surface.Name: base_properties['GrossArea']})
-                # result += f"Object name: {floor.Name}<br>"
-                # result += f"&emsp;&emsp;Area: {base_properties['GrossArea']} m^2<br>"
-        case "WALL":
-            surfaces = model.by_type('IfcWall')
-
-            # Put the analysis of surfaces into a json string and return it
-            for surface in surfaces:
-                # Get the right properties
-                properties = ifcopenshell.util.element.get_psets(surface)
-                base_properties = properties["BaseQuantities"]
-
-                json_dict[model_name][surface_type_to_string(surface_type)].append(
-                    {surface.Name: base_properties['GrossSideArea']})
-                # result += f"Object name: {floor.Name}<br>"
-                # result += f"&emsp;&emsp;Area: {base_properties['GrossArea']} m^2<br>"
-        case _:
-            return ERROR_BAD_SURFACE_TYPE
-
-    if len(surfaces) == 0:
-        return ERROR_NO_FLOORS
+    obj = types[surface_type]
+    obj.parse()
     
-    return json.dumps(json_dict)
+    return json.dumps(obj.json_dict)
