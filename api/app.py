@@ -117,12 +117,12 @@ def upload():
     logger: Optional[ifcopenshell.validate.json_logger] \
         = ifcopenshell.validate.json_logger()
     error: Optional[int] = try_or_default(-1)(ifcopenshell.validate.validate)(
-        model,logger)
+        model, logger)
     if error == -1:
         return ERROR_INVALID
 
-    analysis = parse(contents, "floors")
-    # analysis = parse(contents, "windows")
+    # analysis = parse(contents, "floors")
+    analysis = parse(contents, "windows")
     # analysis = parse(contents, "walls")
     db.new_analysis(filename, contents, analysis)
 

@@ -62,7 +62,7 @@ class Wall(IFCObject):
         self.get_by_area_type("GrossSideArea")
 
 
-def parse(ifc_file_content, surface_type = "floor"):
+def parse(ifc_file_content, surface_type="floors"):
     ERROR_NO_FLOORS = json.dumps({"error": "no floors found!"})
     ERROR_BAD_SURFACE_TYPE = json.dumps({"error": f"bad surface type: {surface_type}"})
     # ERROR_NYI = json.dumps({"error"})
