@@ -13,12 +13,18 @@ import gzip
 class IFCObject:
     json_dict = dict()
     surfaces = []
+    amount = 0
+    total_area = 0
 
     def __init__(self, model, surface_type, name="Some model name"):
         self.model = model
         self.name = name
         self.surface_type = surface_type
-        self.json_dict = {self.name: {self.surface_type: []}}
+        self.json_dict = {self.name: {self.surface_type: dict()}}
+
+        self.json_dict[self.name][self.surface_type]["amount"] = 0
+        self.json_dict[self.name][self.surface_type]["total_area"] = 0
+        self.json_dict[self.name][self.surface_type][self.surface_type[:-1] + "_list"] = []
 
     def parse(self):
         pass
@@ -30,10 +36,14 @@ class IFCObject:
             properties = ifcopenshell.util.element.get_psets(surface)
             base_properties = properties["BaseQuantities"]
 
-            self.json_dict[self.name][self.surface_type].append(
+            self.json_dict[self.name][self.surface_type][self.surface_type[:-1] + "_list"].append(
                 {surface.Name: base_properties[area_type]})
             # result += f"Object name: {floor.Name}<br>"
             # result += f"&emsp;&emsp;Area: {base_properties['GrossArea']} m^2<br>"
+            self.total_area += base_properties[area_type]
+
+        self.json_dict[self.name][self.surface_type]["total_area"] = self.total_area
+        self.json_dict[self.name][self.surface_type]["amount"] = len(self.surfaces)
 
 
 class Floor(IFCObject):
