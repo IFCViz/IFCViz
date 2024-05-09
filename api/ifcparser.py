@@ -1,3 +1,8 @@
+"""
+This module implements the core parsing logic for the IFCViz project.
+"""
+
+
 import ifcopenshell
 import ifcopenshell.file
 import ifcopenshell.util.element
@@ -38,7 +43,7 @@ def parse(ifc_file_content, surface_type = "FLOOR"):
             return ERROR_NYI # what to put here??
         case _:
             return ERROR_BAD_SURFACE_TYPE
-            
+
     if len(surfaces) == 0:
         return ERROR_NO_FLOORS
 
