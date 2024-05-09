@@ -121,6 +121,7 @@ def upload():
     if error == -1:
         return ERROR_INVALID
 
+    # Todo: Test single mods
     # analysis = parse(contents, "floors")
     # analysis = parse(contents, "windows")
     # analysis = parse(contents, "walls")

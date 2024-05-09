@@ -22,6 +22,8 @@ class Parser:
             "floors": Floor(model),
             "windows": Window(model),
             "walls": Wall(model),
+            "doors": Door(model),
+            "roofs": Roof(model),
         }
 
     def parse(self):
@@ -64,12 +66,13 @@ class IFCObject:
             properties = ifcopenshell.util.element.get_psets(surface)
             base_properties = properties["BaseQuantities"]
 
-            self.data[self.surface_type[:-1] + "_list"].append(
-                {surface.Name: base_properties[area_type]})
-            # result += f"Object name: {floor.Name}<br>"
-            # result += f"&emsp;&emsp;Area: {base_properties['GrossArea']} m^2<br>"
+            self.data[self.surface_type[:-1] + "_list"].append({
+                "name": surface.Name,
+                "area": base_properties[area_type],
+            })
             self.total_area += base_properties[area_type]
 
+        # Todo: Add more fields (such as objects with min/max area, etc.)? Move from here?
         self.data["total_area"] = self.total_area
         self.data["amount"] = len(self.surfaces)
 
@@ -84,6 +87,24 @@ class Floor(IFCObject):
                          ifcopenshell.util.element.get_predefined_type(floor) == "FLOOR"]
         self.get_by_area_type("GrossArea")
 
+    def get_by_area_type(self, area_type):
+        # Put the analysis of surfaces into a json string and return it
+        for surface in self.surfaces:
+            # Get the right properties
+            properties = ifcopenshell.util.element.get_psets(surface)
+            base_properties = properties["BaseQuantities"]
+
+            self.data[self.surface_type[:-1] + "_list"].append({
+                "name": surface.Name,
+                "area": base_properties[area_type],
+                "thickness": base_properties["Width"]
+            })
+            self.total_area += base_properties[area_type]
+
+        # Todo: Add more fields (such as objects with min/max area, etc.)? Move from here?
+        self.data["total_area"] = self.total_area
+        self.data["amount"] = len(self.surfaces)
+
 
 class Window(IFCObject):
     def __init__(self, model, name="Some floor name"):
@@ -95,6 +116,83 @@ class Window(IFCObject):
         self.surfaces = self.model.by_type('IfcWindow')
         self.get_by_area_type("GrossArea")
 
+    def get_by_area_type(self, area_type):
+        # Put the analysis of surfaces into a json string and return it
+        for surface in self.surfaces:
+            # Get the right properties
+            properties = ifcopenshell.util.element.get_psets(surface)
+            base_properties = properties["BaseQuantities"]
+
+            self.data[self.surface_type[:-1] + "_list"].append({
+                "name": surface.Name,
+                "area": base_properties[area_type],
+                "perimeter": base_properties["Perimeter"]
+            })
+            self.total_area += base_properties[area_type]
+
+        # Todo: Add more fields (such as objects with min/max area, etc.)? Move from here?
+        self.data["total_area"] = self.total_area
+        self.data["amount"] = len(self.surfaces)
+
+
+class Door(IFCObject):
+    def __init__(self, model, name="Some floor name"):
+        # Todo: Correct?
+        self.surface_type = "doors"
+        super().__init__(model, name)
+
+    def parse(self):
+        self.surfaces = self.model.by_type('IfcDoor')
+        self.get_by_area_type("Area")
+
+    def get_by_area_type(self, area_type):
+        # Put the analysis of surfaces into a json string and return it
+        for surface in self.surfaces:
+            # Get the right properties
+            properties = ifcopenshell.util.element.get_psets(surface)
+            base_properties = properties["BaseQuantities"]
+
+            self.data[self.surface_type[:-1] + "_list"].append({
+                "name": surface.Name,
+                "area": base_properties[area_type],
+                "height": base_properties["Height"]
+            })
+            self.total_area += base_properties[area_type]
+
+        # Todo: Add more fields (such as objects with min/max area, etc.)? Move from here?
+        self.data["total_area"] = self.total_area
+        self.data["amount"] = len(self.surfaces)
+
+
+class Roof(IFCObject):
+    def __init__(self, model, name="Some floor name"):
+        # Todo: Correct?
+        self.surface_type = "roofs"
+        super().__init__(model, name)
+
+    def parse(self):
+        self.surfaces = [floor for floor in self.model.by_type('IfcSlab') if
+                         ifcopenshell.util.element.get_predefined_type(floor) == "ROOF"]
+        self.get_by_area_type("GrossArea")
+
+    def get_by_area_type(self, area_type):
+        # Put the analysis of surfaces into a json string and return it
+        for surface in self.surfaces:
+            # Get the right properties
+            properties = ifcopenshell.util.element.get_psets(surface)
+            base_properties = properties["BaseQuantities"]
+
+            self.data[self.surface_type[:-1] + "_list"].append({
+                "name": surface.Name,
+                "area": base_properties[area_type],
+                "thickness": base_properties["Width"]
+            })
+            self.total_area += base_properties[area_type]
+
+        # Todo: Add more fields (such as objects with min/max area, etc.)? Move from here?
+        self.data["total_area"] = self.total_area
+        self.data["amount"] = len(self.surfaces)
+
 
 class Wall(IFCObject):
     def __init__(self, model, name="Some floor name"):
@@ -104,6 +202,24 @@ class Wall(IFCObject):
     def parse(self):
         self.surfaces = self.model.by_type('IfcWall')
         self.get_by_area_type("GrossSideArea")
+
+    def get_by_area_type(self, area_type):
+        # Put the analysis of surfaces into a json string and return it
+        for surface in self.surfaces:
+            # Get the right properties
+            properties = ifcopenshell.util.element.get_psets(surface)
+            base_properties = properties["BaseQuantities"]
+
+            self.data[self.surface_type[:-1] + "_list"].append({
+                "name": surface.Name,
+                "area": base_properties[area_type],
+                "thickness": base_properties["Width"]
+            })
+            self.total_area += base_properties[area_type]
+
+        # Todo: Add more fields (such as objects with min/max area, etc.)? Move from here?
+        self.data["total_area"] = self.total_area
+        self.data["amount"] = len(self.surfaces)
 
 
 def parse(ifc_file_content, surface_type="all"):
