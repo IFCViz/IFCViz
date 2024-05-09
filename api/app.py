@@ -133,6 +133,7 @@ def upload():
 
 @app.route("/metadata/<string:filehash>")
 def metadata(filehash: str):
+    # Todo: Double send?
     ERROR_INVALID = make_response(json.dumps({'error': 'invalid hash provided'}),   400)
     ERROR_NO_FILE = make_response(json.dumps({'error': 'file does not exist'}),     400)
 
