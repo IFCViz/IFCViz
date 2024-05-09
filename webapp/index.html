@@ -171,25 +171,50 @@
 
              
     </script>
-
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </head>
 
 <body>
 <div id="app">
+    <div style="width: 100%; opacity: 100%; display: inline-grid; align-items: center; justify-items: center; grid-template-columns: 0.4fr 0.4fr 1.4fr; margin-top: 0">
+        <img style="width: 45%" src="https://intra.kth.se/img/logotype-blue-ff671d438dd60cb940a663d2fd5e0cf9.svg"/>
+        <img style="width: 100%; padding-top: 2%" src="https://api2.envirobase.se/api/V1/MediaFile/Contained/480x320x30/ffffff/2819/"/>
+
+        <p></p>
+
+    </div>
+    <div style="height: 75%; display:grid; grid-template-rows: 0.2fr 0.8fr; align-items: center;">
+        <div>
+    <h1 style="margin-top: 0 a">IFCViz</h1> 
+    <p> 
+        Drop your IFC file onto this window to have it analyzed by our proprietary bipavision™ technology.
+        This service is provided without warranty.
+    </p>
+</div>
 	<!-- <button @click="count++">{{ count }}</button> -->
+    
+    <div>
     <div
         id="droptarget" 
 	ondragover="allowDrop(event)"
         ondrop="handleDrop(event)"
-        style="border: 2px dashed #ccc; padding: 20px; margin-top: 20px;"
+        style="border: 2px dashed #ccc; padding: 20px;"
     >
         Drop your file here
     </div>
-
+    </div>
     <div id="container">
-
+    
     </div>
 </div>
+    <br>
+    <div style="width: 35em; position: absolute; left: 50%; transform: translateX(-50%); bottom: 3em; display: inline-grid; grid-template-columns: 1fr 0.1fr 1fr; margin-top: 20%; gap: 0.75em">
+    <button onclick="alert(atob('WU9VIEFDS05PV0xFREdFIEFORCBBR1JFRSBUSEFUIFRIRSBTT0ZUV0FSRSBJUyBQUk9WSURFRCBUTyBZT1UgT04gQU4gIkFTIElTIiBCQVNJUy4KVEhFIExJQ0VOU09SIERJU0NMQUlNUyBBTlkgQU5EIEFMTCBSRVBSRVNFTlRBVElPTlMgQU5EIFdBUlJBTlRJRVMsIEVYUFJFU1MgT1IgSU1QTElFRApJTkNMVURJTkcgKFdJVEhPVVQgTElNSVRBVElPTikgQU5ZIElNUExJRUQgV0FSUkFOVElFUyBPRiBNRVJDSEFOVEFCSUxJVFksIE9SIEhBUkRXQVJFCk9SIFNPRlRXQVJFIENPTVBBVElCSUxJVFksIE9SIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NFIE9SIFVTRSwgSU5DTFVESU5HIFlPVVIKUEFSVElDVUxBUiBCVVNJTkVTUyBPUiBJTlRFTkRFRCBVU0UsIE9SIE9GIFRIRSBTT0ZUV0FSRSdTIFJFTElBQklMSVRZLCBQRVJGT1JNQU5DRSBPUgpDT05USU5VRUQgQVZBSUxBQklMSVRZLiBUSEUgTElDRU5TT1IgRE9FUyBOT1QgUkVQUkVTRU5UIE9SIFdBUlJBTlQgVEhBVCBUSEUKU09GVFdBUkUgT1IgQ0FMQ1VMQVRJT05TIE9SIFBSSU5UUyBPUiBFWFBPUlQgREFUQSBNQURFIFRIRVJFT0YgV0lMTCBCRSBGUkVFIEZST00KVklSVVNFUywgTUFMV0FSRSwgVFJPSkFOIEhPUlNFUyBPUiBBTlkgT1RIRVIgREVGRUNUUyBPUiBFUlJPUlMgQU5EIFRIQVQgQU5ZIFNVQ0gKRUZGRUNUUyBPUiBFUlJPUlMgV0lMTCBCRSBDT1JSRUNURUQsIE9SIFRIQVQgSVQgV0lMTCBPUEVSQVRFIFdJVEhPVVQgSU5URVJSVVBUSU9OLgpZT1UgQUdSRUUgVEhBVCBZT1UgQVJFIFNPTEVMWSBSRVNQT05TSUJMRSBGT1IgQUxMIENPU1RTIEFORCBFWFBFTlNFUyBBU1NPQ0lBVEVECldJVEggUkVDVElGSUNBVElPTiwgUkVQQUlSIE9SIERBTUFHRSBDQVVTRUQgQlkgU1VDSCBERUZFQ1RTLCBFUlJPUlMgT1IgSU5URVJSVVBUSU9OUy4KRlVSVEhFUiwgVEhFIExJQ0VOU09SIERPRVMgTk9UIFJFUFJFU0VOVCBBTkQgV0FSUkFOVCBUSEFUIFRIRSBTT0ZUV0FSRSBET0VTIE5PVApJTkZSSU5HRSBUSEUgSU5URUxMRUNUVUFMIFBST1BFUlRZIFJJR0hUIE9GIEFOWSBPVEhFUiBQRVJTT04uIFlPVSBBQ0NFUFQKUkVTUE9OU0lCSUxJVFkgVE8gVkVSSUZZIFRIQVQgVEhFIFNPRlRXQVJFIE1FRVRTIFlPVVIgU1BFQ0lGSUMgUkVRVUlSRU1FTlRTLg=='));">Statement of limitations</button>
+    <p></p>
+    <button onclick="location.href='mailto:smonten@kth.se'">Contact</button>
+    </div>
+</div>  
 
 <style>
     .info-container {
@@ -216,7 +241,6 @@
     }
     #app {
         text-align: center;
-        margin-top: 50px;
     }
 
     button {
