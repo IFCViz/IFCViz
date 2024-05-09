@@ -122,8 +122,8 @@ def upload():
         return ERROR_INVALID
 
     # analysis = parse(contents, "floors")
-    analysis = parse(contents, "windows")
-    # analysis = parse(contents, "walls")
+    # analysis = parse(contents, "windows")
+    analysis = parse(contents, "walls")
     db.new_analysis(filename, contents, analysis)
 
     return make_response(json.dumps({'fileid': filename}), 200)

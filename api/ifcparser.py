@@ -40,25 +40,18 @@ class Floor(IFCObject):
     def parse(self):
         self.surfaces = [floor for floor in self.model.by_type('IfcSlab') if
                          ifcopenshell.util.element.get_predefined_type(floor) == "FLOOR"]
-
         self.get_by_area_type("GrossArea")
 
 
 class Window(IFCObject):
-
     def parse(self):
-        self.surfaces = [floor for floor in self.model.by_type('IfcSlab') if
-                         ifcopenshell.util.element.get_predefined_type(floor) == "FLOOR"]
-
+        self.surfaces = self.model.by_type('IfcWindow')
         self.get_by_area_type("GrossArea")
 
 
 class Wall(IFCObject):
-
     def parse(self):
-        self.surfaces = [floor for floor in self.model.by_type('IfcSlab') if
-                         ifcopenshell.util.element.get_predefined_type(floor) == "FLOOR"]
-
+        self.surfaces = self.model.by_type('IfcWall')
         self.get_by_area_type("GrossSideArea")
 
 
