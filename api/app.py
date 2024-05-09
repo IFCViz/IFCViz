@@ -20,8 +20,6 @@ import ifcopenshell.file
 import ifcopenshell.validate
 
 
-
-
 app = Flask(__name__, template_folder='../webapp')
 CORS(app)
 app.secret_key = "super secret key"
@@ -74,7 +72,7 @@ def send(filehash: str):
         return ERROR_NO_FILE
 
     c = db.get_file(filename)
-    print(c)
+    # print(c)
     contents: io.BytesIO = io.BytesIO(c)
     return send_file(contents, mimetype='application/gzip', as_attachment=False)
 
@@ -123,7 +121,7 @@ def upload():
     if error == -1:
         return ERROR_INVALID
 
-    analysis = parse(contents)
+    analysis = parse(contents, "WINDOW")
     db.new_analysis(filename, contents, analysis)
 
     return make_response(json.dumps({'fileid': filename}), 200)

@@ -21,7 +21,7 @@ def surface_type_to_string(st):
 def parse(ifc_file_content, surface_type = "FLOOR"):
     ERROR_NO_FLOORS = json.dumps({"error": "no floors found!"})
     ERROR_BAD_SURFACE_TYPE = json.dumps({"error": f"bad surface type: {surface_type}"})
-    ERROR_NYI = json.dumps({"error"})
+    # ERROR_NYI = json.dumps({"error"})
 
     model = None
     
@@ -40,7 +40,8 @@ def parse(ifc_file_content, surface_type = "FLOOR"):
         case "FLOOR":
             surfaces = [floor for floor in model.by_type('IfcSlab') if ifcopenshell.util.element.get_predefined_type(floor) == "FLOOR"]
         case "WINDOW":
-            return ERROR_NYI # what to put here??
+            walls = model.by_type('IfcWindow')
+            surfaces = walls
         case _:
             return ERROR_BAD_SURFACE_TYPE
 
