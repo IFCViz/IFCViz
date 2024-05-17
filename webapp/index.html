@@ -1,6 +1,9 @@
 <html>
 <head>
     <script>
+        /**
+        * Simple utility function to create a visible error message
+        */
         function create_error_message(message){
             let text_box = document.createElement("div");
             text_box.classList.add("error-message");
@@ -11,10 +14,13 @@
             document.body.appendChild(text_box);
         }
 
+        /**
+        * Helper function, displays information about floors
+        */
         function display_floors(model){
             let floor_box = document.createElement("div");
             floor_box.id = "ifc-information-container";
-        
+            
             let label = document.createElement("h4");
             label.id = "ifc-information-container-label";
             label.textContent = "Floor Information";
@@ -27,7 +33,10 @@
                 text_element.textContent = JSON.stringify(v);
                 floor_box.appendChild(text_element);
             }
-            document.body.appendChild(floor_box);
+            let app_obj = document.getElementById("app");
+            let mid_region_obj = document.getElementById("mid_region");
+            let drop_target_obj = document.getElementById("drop_target");
+            mid_region_obj.insertBefore(floor_box, drop_target_obj);
         }
 
         function display_extraction(extraction){
@@ -36,12 +45,18 @@
             display_floors(model);
         }
 
-
-		function allowDrop(ev) {
+        /** 
+        * When dropping a file into the browser window, this prevents the default
+        * behaviour - that the browser opens the file in a new window.
+		*/
+         function allowDrop(ev) {
             ev.preventDefault();
         }
 
-        function handleDrop(event) {
+        /**
+        * This function is called on-drop
+        */
+         function handleDrop(event) {
             event.preventDefault();
 
             const file = event.dataTransfer.files[0];
@@ -72,6 +87,7 @@
             return blob;
         }
 
+        //Just a utility function that console logs a text file
         async function log_textfile(text_file){
             const freader = new FileReader();
             freader.onload = (evt) => {
@@ -95,6 +111,9 @@
             }
             return (await response.json()).fileid;
         }
+
+        //Returning the extracted information from the IFC-file 
+        //associated with the given file hash
         async function get_metadata(file_hash){
             let response = await fetch('http://localhost:5000/metadata/' + file_hash, {
                 method: 'GET'
@@ -151,6 +170,7 @@
             */ 
         }
 
+        //Returns the entirety of the file associated with the given file hash.
         async function request_file(file_hash){
             let response;
             response = await fetch("http://localhost:5000/receive/" + file_hash, {
@@ -184,17 +204,15 @@
         <p></p>
 
     </div>
-    <div style="height: 75%; display:grid; grid-template-rows: 0.2fr 0.8fr; align-items: center;">
-        <div>
-    <h1 style="margin-top: 0 a">IFCViz</h1> 
-    <p> 
-        Drop your IFC file onto this window to have it analyzed by our proprietary bipavision™ technology.
-        This service is provided without warranty.
-    </p>
-</div>
-	<!-- <button @click="count++">{{ count }}</button> -->
-    
+<div id = "mid_region" style="height: 75%; display:grid; grid-template-rows: 0.2fr 0.8fr; align-items: center;">
     <div>
+        <h1 style="margin-top: 0 a">IFCViz</h1> 
+        <p> 
+            Drop your IFC file onto this window to have it analyzed by our proprietary bipavision™ technology.
+            This service is provided without warranty.
+        </p>
+    </div>
+    
     <div
         id="droptarget" 
 	ondragover="allowDrop(event)"
@@ -202,7 +220,6 @@
         style="border: 2px dashed #ccc; padding: 20px;"
     >
         Drop your file here
-    </div>
     </div>
     <div id="container">
     
