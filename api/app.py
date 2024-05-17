@@ -20,8 +20,6 @@ import ifcopenshell.file
 import ifcopenshell.validate
 
 
-
-
 app = Flask(__name__, template_folder='../webapp')
 CORS(app)
 app.secret_key = "super secret key"
@@ -74,7 +72,7 @@ def send(filehash: str):
         return ERROR_NO_FILE
 
     c = db.get_file(filename)
-    print(c)
+    # print(c)
     contents: io.BytesIO = io.BytesIO(c)
     return send_file(contents, mimetype='application/gzip', as_attachment=False)
 
@@ -119,11 +117,15 @@ def upload():
     logger: Optional[ifcopenshell.validate.json_logger] \
         = ifcopenshell.validate.json_logger()
     error: Optional[int] = try_or_default(-1)(ifcopenshell.validate.validate)(
-        model,logger)
+        model, logger)
     if error == -1:
         return ERROR_INVALID
 
-    analysis = parse(contents)
+    # Todo: Test single mods
+    # analysis = parse(contents, "floors")
+    # analysis = parse(contents, "windows")
+    # analysis = parse(contents, "walls")
+    analysis = parse(contents, "all")
     db.new_analysis(filename, contents, analysis)
 
     return make_response(json.dumps({'fileid': filename}), 200)
@@ -131,6 +133,7 @@ def upload():
 
 @app.route("/metadata/<string:filehash>")
 def metadata(filehash: str):
+    # Todo: Double send?
     ERROR_INVALID = make_response(json.dumps({'error': 'invalid hash provided'}),   400)
     ERROR_NO_FILE = make_response(json.dumps({'error': 'file does not exist'}),     400)
 
