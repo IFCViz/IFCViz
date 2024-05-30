@@ -191,7 +191,7 @@
         async function uploadFile(file) {
             const blob = await gzip_file(file);
             let response;
-            response = await fetch('http://localhost:8080/upload',{
+            response = await fetch('http://46.101.114.188:8080/upload',{
                 method: 'POST',
                 body: blob
             });
@@ -208,7 +208,7 @@
         //Returning the extracted information from the IFC-file 
         //associated with the given file hash
         async function get_metadata(file_hash){
-            let response = await fetch('http://localhost:8080/metadata/' + file_hash, {
+            let response = await fetch('http://46.101.114.188:8080/metadata/' + file_hash, {
                 method: 'GET'
             });
             if(response.ok == false){
@@ -240,7 +240,7 @@
         //Returns the entirety of the file associated with the given file hash.
         async function request_file(file_hash){
             let response;
-            response = await fetch("http://localhost:8080/receive/" + file_hash, {
+            response = await fetch("http://46.101.114.188:8080/receive/" + file_hash, {
                 method: "GET"
             })
             if(response.ok == false){
