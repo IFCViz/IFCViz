@@ -115,9 +115,9 @@
             parent.appendChild(windows_box);
         }
 
-        function display_extraction(extraction){
+        function display_extraction(extraction, hash){
             console.log(extraction);
-            let model_name = "hash_for_the_file";
+            let model_name = hash;
             let model = extraction[model_name];
             console.log(model);
 
@@ -224,7 +224,7 @@
         async function request_and_present(file_hash){
             const received_file = await request_file(file_hash);
             console.log(await get_metadata(file_hash));
-            display_extraction(await get_metadata(file_hash));
+            display_extraction(await get_metadata(file_hash), file_hash);
             //await log_textfile(received_file);
         }
         
