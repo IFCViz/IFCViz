@@ -125,7 +125,7 @@ def upload():
     # analysis = parse(contents, "floors")
     # analysis = parse(contents, "windows")
     # analysis = parse(contents, "walls")
-    analysis = parse(contents, "all")
+    analysis = parse(contents, "all", filename)
     db.new_analysis(filename, contents, analysis)
 
     return make_response(json.dumps({'fileid': filename}), 200)

@@ -1,7 +1,19 @@
 <html>
 <head>
     <script>
-        /**
+        function check_fragment(){
+            let hash = window.location.hash;
+            console.log(hash);
+            if(hash == ""){
+                console.log("No hash");
+            }else{
+                let handle = hash.substring(1);
+                console.log("Handle", handle);
+                request_and_present(handle);
+            }
+        }
+       
+       /**
         * Simple utility function to create a visible error message
         */
         function create_error_message(message){
@@ -13,52 +25,131 @@
             text_box.appendChild(text_element);
             document.body.appendChild(text_box);
         }
-
         /**
         * Helper function, displays information about floors
         */
-        function display_floors(model){
-            let floor_box = document.createElement("div");
-            floor_box.id = "ifc-information-container";
-            
-            let label = document.createElement("h4");
-            label.id = "ifc-information-container-label";
-            label.textContent = "Floor Information";
-            floor_box.appendChild(label);
 
-            let floors = model.floors;
-            console.log(model, floors);
-            for (const [i, v] of floors.entries()){
-                let text_element = document.createElement("p");
-                text_element.textContent = JSON.stringify(v);
-                floor_box.appendChild(text_element);
+        function display_entity(parent, entity_information){
+            let container = document.createElement("div");
+            container.classList.add("information_entity");
+            console.log(entity_information);
+            for(const [key,value] of Object.entries(entity_information)){
+                console.log(key,value);
+                let attribute = document.createElement("p");
+                attribute.innerHTML = key + ": " + value;
+                container.appendChild(attribute);
             }
-            let app_obj = document.getElementById("app");
-            let mid_region_obj = document.getElementById("mid_region");
-            let drop_target_obj = document.getElementById("drop_target");
-            mid_region_obj.insertBefore(floor_box, drop_target_obj);
+            parent.appendChild(container);
+        }
+
+        function display_information_box(parent, key, value){
+            let label = document.createElement("h5");
+            label.textContent = key + ": " + value;
+            parent.appendChild(label);
+        }
+
+        function display_information_container_label(parent, text){
+            let label = document.createElement("h4");
+            label.classList.add("ifc-information-container-label");
+            label.textContent = text;
+            parent.appendChild(label);
+        }
+
+        function display_floors(model, parent){
+            let floor_box = document.createElement("div");
+            floor_box.classList.add("ifc-information-container");
+
+            display_information_container_label(floor_box, "Floor Information");
+
+            let floor_information = model.floors;
+            let floor_cnt = floor_information.amount;
+            let total_floor_area = floor_information.total_area;
+
+            display_information_box(floor_box, "Total area", total_floor_area);
+            display_information_box(floor_box, "Number of floors", floor_cnt);
+            parent.appendChild(floor_box);
+        }
+
+        function display_walls(model, parent){
+            let wall_box = document.createElement("div");
+            wall_box.classList.add("ifc-information-container");
+            
+            display_information_container_label(wall_box, "Wall Information");
+
+            let wall_information = model.walls;
+            let wall_cnt = wall_information.amount;
+            let total_wall_area = wall_information.total_area;
+
+            display_information_box(wall_box, "Total area", total_wall_area);
+            display_information_box(wall_box, "Number of walls", wall_cnt);
+            parent.appendChild(wall_box);
+        }
+
+        function display_roofs(model, parent){
+            let roof_box = document.createElement("div");
+            roof_box.classList.add("ifc-information-container");
+            
+            display_information_container_label(roof_box, "Roof Information");
+
+            let roof_information = model.roofs;
+            let roof_cnt = roof_information.amount;
+            let total_roof_area = roof_information.total_area;
+
+            display_information_box(roof_box, "Total area", total_roof_area);
+            display_information_box(roof_box, "Number of roofs", roof_cnt);
+            parent.appendChild(roof_box);
+        }
+
+        function display_windows(model, parent){
+            let windows_box = document.createElement("div");
+            windows_box.classList.add("ifc-information-container");
+            
+            display_information_container_label(windows_box, "Window Information");
+
+            let window_information = model.windows;
+            let window_cnt = window_information.amount;
+            let total_window_area = window_information.total_area;
+
+            display_information_box(windows_box, "Total area", total_window_area);
+            display_information_box(windows_box, "Number of roofs", window_cnt);
+            parent.appendChild(windows_box);
         }
 
         function display_extraction(extraction){
-            let model_name = "Some model name";
+            console.log(extraction);
+            let model_name = "hash_for_the_file";
             let model = extraction[model_name];
-            display_floors(model);
+            console.log(model);
+
+            let app_obj = document.getElementById("app");
+            let mid_region_obj = document.getElementById("mid_region");
+            
+            //Need to make an array, otherwise we get a Live HTMLCollection
+            let li = Array.from(mid_region_obj.getElementsByClassName("ifc-information-container"));
+            for(let i = 0; i < li.length; i++){
+                li[i].remove();
+            }
+            
+            display_floors(model, mid_region_obj);
+            display_walls(model, mid_region_obj);
+            display_windows(model, mid_region_obj);
+            display_roofs(model, mid_region_obj);
         }
 
         /** 
         * When dropping a file into the browser window, this prevents the default
         * behaviour - that the browser opens the file in a new window.
 		*/
-         function allowDrop(ev) {
+        function allowDrop(ev) {
             ev.preventDefault();
         }
 
         /**
         * This function is called on-drop
         */
-         function handleDrop(event) {
+        function handleDrop(event) {
             event.preventDefault();
-
+        
             const file = event.dataTransfer.files[0];
 
             if (file) {
@@ -109,7 +200,9 @@
                 console.log(response.error);
                 return null;
             }
-            return (await response.json()).fileid;
+            let hash = (await response.json()).fileid;
+            window.location.hash = "#" + hash;
+            return hash;
         }
 
         //Returning the extracted information from the IFC-file 
@@ -130,6 +223,8 @@
 
         async function request_and_present(file_hash){
             const received_file = await request_file(file_hash);
+            console.log(await get_metadata(file_hash));
+            display_extraction(await get_metadata(file_hash));
             //await log_textfile(received_file);
         }
         
@@ -140,34 +235,6 @@
             
             //response.fileid is the hash
             await request_and_present(file_hash);
-            console.log(await get_metadata(file_hash));
-            display_extraction(await get_metadata(file_hash));
-            
-            /*
-            ifc_info = JSON.parse(response.value)["my_list"];
-            let containerDiv = document.createElement('div');
-            containerDiv.classList.add('info-container');
-
-            for (let i = 0; i < ifc_info.length; i++) {
-                Object.keys(ifc_info[i]).forEach(function(k) {
-                    let infoDiv = document.createElement('div');
-                    infoDiv.classList.add('info-div');
-
-                    let keySpan = document.createElement('span');
-                    keySpan.classList.add('info-key');
-                    keySpan.innerText = k + ': ';
-
-                    let valueSpan = document.createElement('span');
-                    valueSpan.classList.add('info-value');
-                    valueSpan.innerText = ifc_info[i][k] + " kvm";
-
-                    infoDiv.appendChild(keySpan);
-                    infoDiv.appendChild(valueSpan);
-                    containerDiv.appendChild(infoDiv);
-                });
-            }
-            document.getElementById('container').appendChild(containerDiv) 
-            */ 
         }
 
         //Returns the entirety of the file associated with the given file hash.
@@ -187,26 +254,26 @@
             const parsed_blob = await ungzip_blob(response);
             const new_file = new File([parsed_blob], "../requested_files/"+file_hash+".txt", {type:"text/plain"});
             return new_file;
-        }
-
-             
+        }       
     </script>
+
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+
 </head>
 
-<body>
+<body onload="check_fragment()">
+
 <div id="app">
     <div style="width: 100%; opacity: 100%; display: inline-grid; align-items: center; justify-items: center; grid-template-columns: 0.4fr 0.4fr 1.4fr; margin-top: 0">
         <img style="width: 45%" src="https://intra.kth.se/img/logotype-blue-ff671d438dd60cb940a663d2fd5e0cf9.svg"/>
         <img style="width: 100%; padding-top: 2%" src="https://api2.envirobase.se/api/V1/MediaFile/Contained/480x320x30/ffffff/2819/"/>
-
-        <p></p>
-
     </div>
-<div id = "mid_region" style="height: 75%; display:grid; grid-template-rows: 0.2fr 0.8fr; align-items: center;">
+<div id = "mid_region" style="align-items: center;">
     <div>
-        <h1 style="margin-top: 0 a">IFCViz</h1> 
+        <h1>IFCViz</h1> 
         <p> 
             Drop your IFC file onto this window to have it analyzed by our proprietary bipavision™ technology.
             This service is provided without warranty.
@@ -215,14 +282,11 @@
     
     <div
         id="droptarget" 
-	ondragover="allowDrop(event)"
+	    ondragover="allowDrop(event)"
         ondrop="handleDrop(event)"
         style="border: 2px dashed #ccc; padding: 20px;"
     >
         Drop your file here
-    </div>
-    <div id="container">
-    
     </div>
 </div>
     <br>
@@ -234,12 +298,6 @@
 </div>  
 
 <style>
-    .info-container {
-        display: flex;
-        flex-direction: column;
-        margin-top: 20px;
-    }
-
     .info-div {
         display: flex;
         justify-content: space-between;
@@ -282,14 +340,14 @@
         cursor: pointer;
     }
 
-    #ifc-information-container{
+    .ifc-information-container{
         border: 2px dashed #ccc;
         padding: 20px;
         margin-top: 20px;
+        height: 10%;
     }
     
-    #ifc-information-container-label{
-        font-size: 16px;
+    .ifc-information-container-label{
         background-color: #ebeff5;
         border-radius: 10px;
         /* border-width: 2px; */
@@ -298,6 +356,13 @@
         text-align: center;
         padding-top: 0px;
         margin-top: 0px;
+    }
+
+    .information_entity{
+        float: left;
+        padding-left: 2%;
+        background-color:#45a049;
+        margin-left: 2%;
     }
 
     .ifc-information{
@@ -325,5 +390,3 @@
 </style>
 </body>
 </html>
-
-
