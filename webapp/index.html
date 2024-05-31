@@ -44,7 +44,7 @@
 
         function display_information_box(parent, key, value){
             let label = document.createElement("h5");
-            label.textContent = key + ": " + value;
+            label.textContent = key + ": " + value.toFixed(2) + " m²";
             parent.appendChild(label);
         }
 
