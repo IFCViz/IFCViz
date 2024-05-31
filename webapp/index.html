@@ -112,7 +112,7 @@
             let window_cnt = window_information.amount;
             let total_window_area = window_information.total_area;
 
-            display_information_box(windows_box, "Total area", total_window_area);
+            display_information_box(windows_box, "Total area", format_area(total_window_area));
             display_information_box(windows_box, "Number of windows", window_cnt);
             parent.appendChild(windows_box);
         }
