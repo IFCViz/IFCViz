@@ -111,7 +111,7 @@
             let total_window_area = window_information.total_area;
 
             display_information_box(windows_box, "Total area", total_window_area);
-            display_information_box(windows_box, "Number of roofs", window_cnt);
+            display_information_box(windows_box, "Number of windows", window_cnt);
             parent.appendChild(windows_box);
         }
 
@@ -343,8 +343,9 @@
     .ifc-information-container{
         border: 2px dashed #ccc;
         padding: 20px;
-        margin-top: 20px;
-        height: 10%;
+        margin: 20px auto 0 auto;
+	width: 70%;
+        height: 8%;
     }
     
     .ifc-information-container-label{
