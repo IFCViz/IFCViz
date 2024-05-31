@@ -41,10 +41,12 @@
             }
             parent.appendChild(container);
         }
-
+	function format_area(area_float) {
+		return area_float.toFixed(2) + " m²"
+	}
         function display_information_box(parent, key, value){
             let label = document.createElement("h5");
-            label.textContent = key + ": " + value.toFixed(2) + " m²";
+            label.textContent = key + ": " + value;
             parent.appendChild(label);
         }
 
@@ -65,7 +67,7 @@
             let floor_cnt = floor_information.amount;
             let total_floor_area = floor_information.total_area;
 
-            display_information_box(floor_box, "Total area", total_floor_area);
+            display_information_box(floor_box, "Total area", format_area(total_floor_area));
             display_information_box(floor_box, "Number of floors", floor_cnt);
             parent.appendChild(floor_box);
         }
@@ -80,7 +82,7 @@
             let wall_cnt = wall_information.amount;
             let total_wall_area = wall_information.total_area;
 
-            display_information_box(wall_box, "Total area", total_wall_area);
+            display_information_box(wall_box, "Total area", format_area(total_wall_area));
             display_information_box(wall_box, "Number of walls", wall_cnt);
             parent.appendChild(wall_box);
         }
@@ -95,7 +97,7 @@
             let roof_cnt = roof_information.amount;
             let total_roof_area = roof_information.total_area;
 
-            display_information_box(roof_box, "Total area", total_roof_area);
+            display_information_box(roof_box, "Total area", format_area(total_roof_area));
             display_information_box(roof_box, "Number of roofs", roof_cnt);
             parent.appendChild(roof_box);
         }
