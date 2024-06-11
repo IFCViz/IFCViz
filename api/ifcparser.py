@@ -14,10 +14,10 @@ class Parser:
     def __init__(self, ifc_file_content, surface_type="all", file_name="hash_for_the_file"):
         model = ifcopenshell.file().from_string(gzip.decompress(ifc_file_content).decode())
         self.surface_type = surface_type
-        # Todo: Make a solution for multiple files, with hashes instead of names
         self.file_name = file_name
         self.json_dict = {self.file_name: dict()}
 
+        # Add more objects to parse here
         self.ifc_objects = {
             "floors": Floor(model),
             "windows": Window(model),
@@ -27,6 +27,10 @@ class Parser:
         }
 
     def parse(self):
+        """
+        Parses depending on the surface type. With type "all", parses all the fields in self.ifc_object
+        """
+
         if self.surface_type == "all":
             for key, obj in self.ifc_objects.items():
                 obj.parse()
@@ -41,6 +45,9 @@ class Parser:
 
 
 class IFCObject:
+    """
+    A base class IFC objects
+    """
     json_dict = dict()
     surfaces = []
     amount = 0
@@ -52,15 +59,18 @@ class IFCObject:
         self.model = model
         self.name = name
 
+        # Data is the final json send back to the client
         self.data = dict()
         self.data["amount"] = 0
         self.data["total_area"] = 0
         self.data[self.surface_type[:-1] + "_list"] = []
 
+        # Tries to find base properties (such as "area") in the following IFC Object Fields
         self.base_properties = [
             "BaseQuantities",
             "Dimensions"
         ]
+        # Tries to match one of the following keywords for the area
         self.area_keywords = [
             "Area",
             "GrossArea",
@@ -68,6 +78,10 @@ class IFCObject:
         ]
 
     def parse(self):
+        """
+        Parses the file depending on the object type, or in many cases own implementation
+        (defines its own self.surfaces in that case)
+        """
         self.get_by_area_type(self.surface_type)
 
         # Todo: Add more fields (such as objects with min/max area, etc.)? Move from here?
@@ -75,6 +89,14 @@ class IFCObject:
         # self.data["amount"] = len(self.surfaces)
 
     def get_by_area_type(self, area_type):
+        """
+        Gets area by its type.
+
+        Convention is that the self.surface type is in plural (i.e. "floors"), and the data generates a field with
+        the word without the last letter + "_list" (i.e. "floor_list").
+
+        That one will contain "name" and "area" fields, wihth possible extra fields if defined.
+        """
         # Put the analysis of surfaces into a json string and return it
         for surface in self.surfaces:
             # Get the right properties
@@ -93,13 +115,20 @@ class IFCObject:
                             self.add_more_properties(base_properties)
 
     def add_more_properties(self, base_properties):
+        """
+        Adds more properties defined by self.more_properties
+        """
         for prop, keywords in self.more_properties.items():
             for keyword in keywords:
                 if keyword in base_properties:
                     self.data[self.surface_type[:-1] + "_list"][-1][prop] = base_properties[keyword]
 
 
+# An example of a class for searching Floor objects
 class Floor(IFCObject):
+    """
+    A Floor IFC Object
+    """
     def __init__(self, model, name="Some floor name"):
         self.surface_type = "floors"
         self.more_properties = {
@@ -111,7 +140,9 @@ class Floor(IFCObject):
 
         super().__init__(model, name)
 
+    # Own implementation
     def parse(self):
+        # Searches surfaces by slabs of type floor
         self.surfaces = [floor for floor in self.model.by_type('IfcSlab') if
                          ifcopenshell.util.element.get_predefined_type(floor) == "FLOOR"]
         self.get_by_area_type("GrossArea")
@@ -122,6 +153,9 @@ class Floor(IFCObject):
 
 
 class Window(IFCObject):
+    """
+    A Window IFC Object
+    """
     def __init__(self, model, name="Some floor name"):
         # Todo: Correct?
         self.surface_type = "windows"
@@ -143,6 +177,9 @@ class Window(IFCObject):
 
 
 class Door(IFCObject):
+    """
+    A Door IFC Object
+    """
     def __init__(self, model, name="Some floor name"):
         # Todo: Correct?
         self.surface_type = "doors"
@@ -164,6 +201,9 @@ class Door(IFCObject):
 
 
 class Roof(IFCObject):
+    """
+    A Roof IFC Object
+    """
     def __init__(self, model, name="Some floor name"):
         # Todo: Correct?
         self.surface_type = "roofs"
@@ -186,6 +226,9 @@ class Roof(IFCObject):
 
 
 class Wall(IFCObject):
+    """
+    A Wall IFC Object
+    """
     def __init__(self, model, name="Some floor name"):
         self.surface_type = "walls"
         self.more_properties = {
@@ -206,6 +249,9 @@ class Wall(IFCObject):
 
 
 def parse(ifc_file_content, surface_type="all", hash="no_hash_given"):
+    """
+    Parse function used in server code
+    """
     # ERROR_NO_FLOORS = json.dumps({"error": "no floors found!"})
     # ERROR_BAD_SURFACE_TYPE = json.dumps({"error": f"bad surface type: {surface_type}"})
     # ERROR_NYI = json.dumps({"error"})
