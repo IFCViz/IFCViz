@@ -1,6 +1,9 @@
 # IFCViz
 A tool to visualize IFC files in a browser
 
+![image](https://github.com/IFCViz/IFCViz/assets/48377932/104b250a-5cf9-4f9e-b8c9-1aa0c59b8cd9)
+
+
 ## Dependencies
 - Flask:
 ```bash
