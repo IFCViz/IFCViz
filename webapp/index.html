@@ -1,13 +1,397 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<html>
+<head>
+    <script>
+        function check_fragment(){
+            let hash = window.location.hash;
+            console.log(hash);
+            if(hash == ""){
+                console.log("No hash");
+            }else{
+                let handle = hash.substring(1);
+                console.log("Handle", handle);
+                request_and_present(handle);
+            }
+        }
+       
+       /**
+        * Simple utility function to create a visible error message
+        */
+        function create_error_message(message){
+            let text_box = document.createElement("div");
+            text_box.classList.add("error-message");
+
+            let text_element = document.createElement("p");
+            text_element.textContent = message;
+            text_box.appendChild(text_element);
+            document.body.appendChild(text_box);
+        }
+        /**
+        * Helper function, displays information about floors
+        */
+
+        function display_entity(parent, entity_information){
+            let container = document.createElement("div");
+            container.classList.add("information_entity");
+            console.log(entity_information);
+            for(const [key,value] of Object.entries(entity_information)){
+                console.log(key,value);
+                let attribute = document.createElement("p");
+                attribute.innerHTML = key + ": " + value;
+                container.appendChild(attribute);
+            }
+            parent.appendChild(container);
+        }
+	function format_area(area_float) {
+		return area_float.toFixed(2) + " m²"
+	}
+        function display_information_box(parent, key, value){
+            let label = document.createElement("h5");
+            label.textContent = key + ": " + value;
+            parent.appendChild(label);
+        }
+
+        function display_information_container_label(parent, text){
+            let label = document.createElement("h4");
+            label.classList.add("ifc-information-container-label");
+            label.textContent = text;
+            parent.appendChild(label);
+        }
+
+        function display_floors(model, parent){
+            let floor_box = document.createElement("div");
+            floor_box.classList.add("ifc-information-container");
+
+            display_information_container_label(floor_box, "Floor Information");
+
+            let floor_information = model.floors;
+            let floor_cnt = floor_information.amount;
+            let total_floor_area = floor_information.total_area;
+
+            display_information_box(floor_box, "Total area", format_area(total_floor_area));
+            display_information_box(floor_box, "Number of floors", floor_cnt);
+            parent.appendChild(floor_box);
+        }
+
+        function display_walls(model, parent){
+            let wall_box = document.createElement("div");
+            wall_box.classList.add("ifc-information-container");
+            
+            display_information_container_label(wall_box, "Wall Information");
+
+            let wall_information = model.walls;
+            let wall_cnt = wall_information.amount;
+            let total_wall_area = wall_information.total_area;
+
+            display_information_box(wall_box, "Total area", format_area(total_wall_area));
+            display_information_box(wall_box, "Number of walls", wall_cnt);
+            parent.appendChild(wall_box);
+        }
+
+        function display_roofs(model, parent){
+            let roof_box = document.createElement("div");
+            roof_box.classList.add("ifc-information-container");
+            
+            display_information_container_label(roof_box, "Roof Information");
+
+            let roof_information = model.roofs;
+            let roof_cnt = roof_information.amount;
+            let total_roof_area = roof_information.total_area;
+
+            display_information_box(roof_box, "Total area", format_area(total_roof_area));
+            display_information_box(roof_box, "Number of roofs", roof_cnt);
+            parent.appendChild(roof_box);
+        }
+
+        function display_windows(model, parent){
+            let windows_box = document.createElement("div");
+            windows_box.classList.add("ifc-information-container");
+            
+            display_information_container_label(windows_box, "Window Information");
+
+            let window_information = model.windows;
+            let window_cnt = window_information.amount;
+            let total_window_area = window_information.total_area;
+
+            display_information_box(windows_box, "Total area", format_area(total_window_area));
+            display_information_box(windows_box, "Number of windows", window_cnt);
+            parent.appendChild(windows_box);
+        }
+
+        function display_extraction(extraction, hash){
+            console.log(extraction);
+            let model_name = hash;
+            let model = extraction[model_name];
+            console.log(model);
+
+            let app_obj = document.getElementById("app");
+            let mid_region_obj = document.getElementById("info_region");
+            
+            //Need to make an array, otherwise we get a Live HTMLCollection
+            let li = Array.from(mid_region_obj.getElementsByClassName("ifc-information-container"));
+            for(let i = 0; i < li.length; i++){
+                li[i].remove();
+            }
+            
+            display_floors(model, mid_region_obj);
+            display_walls(model, mid_region_obj);
+            display_windows(model, mid_region_obj);
+            display_roofs(model, mid_region_obj);
+        }
+
+        /** 
+        * When dropping a file into the browser window, this prevents the default
+        * behaviour - that the browser opens the file in a new window.
+		*/
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        /**
+        * This function is called on-drop
+        */
+        function handleDrop(event) {
+            event.preventDefault();
+        
+            const file = event.dataTransfer.files[0];
+
+            if (file) {
+                upload_and_present(file);
+            }
+        }
+
+        //Taking a file object and returning a gzipped blob
+        async function gzip_file(file){
+            const readableFileStream = file.stream();
+            const compressedFileStream = readableFileStream.pipeThrough(
+                new CompressionStream("gzip"),
+            );
+            const compressedResponse = await new Response(compressedFileStream);
+            const blob = await compressedResponse.blob();
+            return blob;
+        }
+
+        //Taking a gzipped blob object and returns an unzipped blob object
+        async function ungzip_blob(gzipped_blob){
+            const decompressedReadableStream = gzipped_blob.stream().pipeThrough(
+                new DecompressionStream('gzip')
+            );
+            const decompressedResponse = await new Response(decompressedReadableStream);
+            const blob = await decompressedResponse.blob();
+            return blob;
+        }
+
+        //Just a utility function that console logs a text file
+        async function log_textfile(text_file){
+            const freader = new FileReader();
+            freader.onload = (evt) => {
+                console.log(evt.target.result);
+            }
+            freader.readAsText(text_file);
+        }
+
+        //Takes a file and uploads to /upload endpoint, returns the response from the server
+        async function uploadFile(file) {
+            const blob = await gzip_file(file);
+            let response;
+            response = await fetch('http://46.101.114.188:8080/upload',{
+                method: 'POST',
+                body: blob
+            });
+            if(response.ok == false){
+                create_error_message("Error uploading file!");
+                console.log(response.error);
+                return null;
+            }
+            let hash = (await response.json()).fileid;
+            window.location.hash = "#" + hash;
+            return hash;
+        }
+
+        //Returning the extracted information from the IFC-file 
+        //associated with the given file hash
+        async function get_metadata(file_hash){
+            let response = await fetch('http://46.101.114.188:8080/metadata/' + file_hash, {
+                method: 'GET'
+            });
+            if(response.ok == false){
+                create_error_message("Error! Could not get metadata!!");
+                console.log(response.error);
+                return null;
+            }
+
+            let extraction = await response.json();
+            return extraction;
+        }
+
+        async function request_and_present(file_hash){
+            const received_file = await request_file(file_hash);
+            console.log(await get_metadata(file_hash));
+            display_extraction(await get_metadata(file_hash), file_hash);
+            //await log_textfile(received_file);
+        }
+        
+        //A function that will upload a file, get the response, and present it in the client's browser
+        async function upload_and_present(file){
+            const file_hash = await uploadFile(file);
+            console.log("value: " + JSON.stringify(file_hash, null, 2));
+            
+            //response.fileid is the hash
+            await request_and_present(file_hash);
+        }
+
+        //Returns the entirety of the file associated with the given file hash.
+        async function request_file(file_hash){
+            let response;
+            response = await fetch("http://46.101.114.188:8080/receive/" + file_hash, {
+                method: "GET"
+            })
+            if(response.ok == false){
+                create_error_message("Failed to recieve file");
+                console.error(response.error);
+                return null;
+            }
+            response = await response.blob();
+
+            console.log(response);
+            const parsed_blob = await ungzip_blob(response);
+            const new_file = new File([parsed_blob], "../requested_files/"+file_hash+".txt", {type:"text/plain"});
+            return new_file;
+        }       
+    </script>
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+
+</head>
+
+<body onload="check_fragment()">
+
+<div id="app">
+    <div style="width: 100%; opacity: 100%; display: inline-grid; align-items: center; justify-items: center; grid-template-columns: 0.4fr 0.4fr 1.4fr; margin-top: 0">
+        <img style="width: 45%" src="https://intra.kth.se/img/logotype-blue-ff671d438dd60cb940a663d2fd5e0cf9.svg"/>
+        <img style="width: 100%; padding-top: 2%" src="https://api2.envirobase.se/api/V1/MediaFile/Contained/480x320x30/ffffff/2819/"/>
+    </div>
+<div id = "mid_region" style="height: 70%; align-items: center;">
+    <div>
+        <h1>IFCViz</h1> 
+        <p> 
+            Drop your IFC file onto this window to have it analyzed by our proprietary bipavision™ technology.
+            This service is provided without warranty.
+        </p>
+    </div>
+    
+    <div
+        id="droptarget" 
+	    ondragover="allowDrop(event)"
+        ondrop="handleDrop(event)"
+        style="border: 2px dashed #ccc; padding: 20px;"
+    >
+        Drop your file here
+	</div>
+
+	<div id="info_region" style="overflow: scroll; height: 70%"></div>
+    </div>
+    <br>
+    <div style="width: 35em; position: absolute; left: 50%; transform: translateX(-50%); bottom: 3em; display: inline-grid; grid-template-columns: 1fr 0.1fr 1fr; margin-top: 20%; gap: 0.75em">
+    <button onclick="alert(atob('WU9VIEFDS05PV0xFREdFIEFORCBBR1JFRSBUSEFUIFRIRSBTT0ZUV0FSRSBJUyBQUk9WSURFRCBUTyBZT1UgT04gQU4gIkFTIElTIiBCQVNJUy4KVEhFIExJQ0VOU09SIERJU0NMQUlNUyBBTlkgQU5EIEFMTCBSRVBSRVNFTlRBVElPTlMgQU5EIFdBUlJBTlRJRVMsIEVYUFJFU1MgT1IgSU1QTElFRApJTkNMVURJTkcgKFdJVEhPVVQgTElNSVRBVElPTikgQU5ZIElNUExJRUQgV0FSUkFOVElFUyBPRiBNRVJDSEFOVEFCSUxJVFksIE9SIEhBUkRXQVJFCk9SIFNPRlRXQVJFIENPTVBBVElCSUxJVFksIE9SIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NFIE9SIFVTRSwgSU5DTFVESU5HIFlPVVIKUEFSVElDVUxBUiBCVVNJTkVTUyBPUiBJTlRFTkRFRCBVU0UsIE9SIE9GIFRIRSBTT0ZUV0FSRSdTIFJFTElBQklMSVRZLCBQRVJGT1JNQU5DRSBPUgpDT05USU5VRUQgQVZBSUxBQklMSVRZLiBUSEUgTElDRU5TT1IgRE9FUyBOT1QgUkVQUkVTRU5UIE9SIFdBUlJBTlQgVEhBVCBUSEUKU09GVFdBUkUgT1IgQ0FMQ1VMQVRJT05TIE9SIFBSSU5UUyBPUiBFWFBPUlQgREFUQSBNQURFIFRIRVJFT0YgV0lMTCBCRSBGUkVFIEZST00KVklSVVNFUywgTUFMV0FSRSwgVFJPSkFOIEhPUlNFUyBPUiBBTlkgT1RIRVIgREVGRUNUUyBPUiBFUlJPUlMgQU5EIFRIQVQgQU5ZIFNVQ0gKRUZGRUNUUyBPUiBFUlJPUlMgV0lMTCBCRSBDT1JSRUNURUQsIE9SIFRIQVQgSVQgV0lMTCBPUEVSQVRFIFdJVEhPVVQgSU5URVJSVVBUSU9OLgpZT1UgQUdSRUUgVEhBVCBZT1UgQVJFIFNPTEVMWSBSRVNQT05TSUJMRSBGT1IgQUxMIENPU1RTIEFORCBFWFBFTlNFUyBBU1NPQ0lBVEVECldJVEggUkVDVElGSUNBVElPTiwgUkVQQUlSIE9SIERBTUFHRSBDQVVTRUQgQlkgU1VDSCBERUZFQ1RTLCBFUlJPUlMgT1IgSU5URVJSVVBUSU9OUy4KRlVSVEhFUiwgVEhFIExJQ0VOU09SIERPRVMgTk9UIFJFUFJFU0VOVCBBTkQgV0FSUkFOVCBUSEFUIFRIRSBTT0ZUV0FSRSBET0VTIE5PVApJTkZSSU5HRSBUSEUgSU5URUxMRUNUVUFMIFBST1BFUlRZIFJJR0hUIE9GIEFOWSBPVEhFUiBQRVJTT04uIFlPVSBBQ0NFUFQKUkVTUE9OU0lCSUxJVFkgVE8gVkVSSUZZIFRIQVQgVEhFIFNPRlRXQVJFIE1FRVRTIFlPVVIgU1BFQ0lGSUMgUkVRVUlSRU1FTlRTLg=='));">Statement of limitations</button>
+    <p></p>
+    <button onclick="location.href='mailto:smonten@kth.se'">Contact</button>
+    </div>
+</div>  
+
+<style>
+    .info-div {
+        display: flex;
+        justify-content: space-between;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 5px;
+    }
+
+    .info-key {
+        font-weight: bold;
+    }
+
+    .info-value {
+        color: #555;
+    }
+    #app {
+        text-align: center;
+    }
+
+    button {
+        font-size: 16px;
+        padding: 10px 20px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    #file-drop-area {
+        border: 2px dashed #ccc;
+        padding: 20px;
+        margin-top: 20px;
+        cursor: pointer;
+    }
+
+    .ifc-information-container{
+        border: 2px dashed #ccc;
+        padding: 20px;
+        margin: 20px auto 0 auto;
+	width: 70%;
+        height: 8.9em;
+    }
+    
+    .ifc-information-container-label{
+        background-color: #ebeff5;
+        border-radius: 10px;
+        /* border-width: 2px; */
+        border-color: f5f5f5;
+        /* border-style: dashed; */
+        text-align: center;
+        padding-top: 0px;
+        margin-top: 0px;
+    }
+
+    .information_entity{
+        float: left;
+        padding-left: 2%;
+        background-color:#45a049;
+        margin-left: 2%;
+    }
+
+    .ifc-information{
+        text-align: left;
+    }
+
+    pre {
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-radius: 4px;
+        overflow: auto;
+        max-width: 600px;
+        margin: 20px auto;
+    }
+
+    .error-message{
+        width: 250px;
+        height: 20px;
+        background-color: black;
+        color: #ff0000; /* Red color for error messages */
+        font-weight: bold; /* Make the text bold */
+        margin-bottom: 10px; /* Add some bottom margin to separate messages */
+    }
+
+</style>
+</body>
 </html>

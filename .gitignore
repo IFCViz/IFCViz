@@ -1,0 +1,7 @@
+venv/
+.venv/
+webapp/node_modules/
+__pycache__/
+*.pyc
+api/tools
+database/data
