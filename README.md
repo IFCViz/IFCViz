@@ -10,9 +10,6 @@ pip3 install lark
 ```
 - Docker
 - Docker compose
-- Node.js (>=18.0.0)
-- NPM
-- yarn:
 ```bash
 sudo npm install --global yarn
 ```
